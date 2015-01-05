@@ -8,11 +8,16 @@
       (is (empty? (:clients @server)))
       (add-client server "hi")
       (is (= "hi" (-> @server :clients first)))))
-  (testing "Remove")
+  (testing "Remove"
     (let [server (ref {:clients ["hi"]})]
       (is (= 1 (count (:clients @server))))
       (remove-client server "not in it")
       (is (= 1 (count (:clients @server))))
       (remove-client server "hi")
-      (is (empty? (:clients @server))))) 
+      (is (empty? (:clients @server)))))
+  (testing "Set System"
+    (let [server (ref {:clients [] :system nil})]
+      (is (nil? (:system @server)))
+      (set-system server "Awesome")
+      (is (= "Awesome" (:system @server)))))) 
  

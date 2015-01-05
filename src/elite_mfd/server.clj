@@ -1,4 +1,5 @@
 (ns elite-mfd.server
+  (:require [cheshire.core :refer [generate-string]])
   (:use org.httpkit.server)
   (:gen-class))
 
@@ -19,6 +20,28 @@
       assoc-in [:clients] 
       (remove #(= % client) (:clients @server)))))
 
+(defn each-client
+  "Perform (pred client) for all clients connected"
+  [server pred]
+  (doall (map pred (:clients @server))))
+
+(defn to-client
+  [client obj]
+  "Send a clj map as JSON to the client"
+  ; right now, just a wrapper; we may want to
+  ;  do some post-processing, however...
+  (send! client (generate-string obj)))
+
+(defn to-all
+  "Send a message to all connected clients of the server"
+  [server message]
+  (each-client server 
+    #(to-client % message)))
+
+(defn notify-system
+  [client system]
+  (to-client client {:type :on-system :system system}))
+
 (defn- create-handler
   [server]
   (fn [request]
@@ -31,7 +54,9 @@
 
       ; handle the client
       (add-client server channel)
-      ; TODO if we know the system, tell them
+      ; if we know the system, tell them
+      (if-let [system (:system @server)]
+        (notify-system channel system))
 
       (on-receive channel 
                   (fn [data]
@@ -50,13 +75,9 @@
 (defn set-system
   "Notify the server that the active system has changed"
   [server system]
+  (log " - Entered System: " system)
   (dosync
     (alter server assoc :system system))
-  ; TODO notify clients of system change
-  )
-
-(defn send-all
-  "Send a message to all connected clients of the server"
-  [server message]
-  (map #(send! % message)
-       (:clients @server)))
+  (if-not (nil? system)
+    ; notify clients of system change
+    (each-client server #(notify-system % system))))

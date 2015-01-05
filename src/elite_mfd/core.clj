@@ -1,8 +1,9 @@
 (ns elite-mfd.core
-  (:require [clojure.data.xml :refer [parse emit]]
+  (:require [clojure.tools.nrepl.server :refer [start-server stop-server]]
+            [clojure.data.xml :refer [parse emit]]
             [clojure.zip :refer [xml-zip root edit node]]
             [clojure.data.zip.xml :as c-d-z-xml
-                :refer [xml-> xml1-> attr attr= text]]
+             :refer [xml-> xml1-> attr attr= text]]
             [clojure.java.io :refer [file reader writer]]
             [elite-mfd.server :refer [create-server set-system]])
   (:import  [java.io RandomAccessFile])
@@ -14,6 +15,7 @@
 ; FIXME actual path
 (def product-root (file (System/getProperty "user.home") "Desktop"))
 (def server-port 9876)
+(def nrepl-port 7888)
 
 ;
 ; Constants
@@ -66,7 +68,6 @@
 
 (defn- tail-seq [input]
   (let [raf (RandomAccessFile. input "r")]
-    (.seek raf (.length raf))
     (raf-seq raf)))
 
 (defn system-poller [pred]
@@ -84,6 +85,7 @@
   ; make sure we're config'd correctly
   (fix-config)
   (log "Starting")
+  (defonce nrepl-server (start-server :port nrepl-port))
   (let [server (create-server server-port)
         system-callback #(set-system server %)
         system-poll-future (future (system-poller system-callback))]
