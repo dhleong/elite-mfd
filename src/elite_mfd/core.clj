@@ -1,4 +1,6 @@
-(ns elite-mfd.core
+(ns ^{:author "Daniel Leong"
+      :doc "Config/Prep/Startup"} 
+  elite-mfd.core
   (:require [clojure.tools.nrepl.server :refer [start-server stop-server]]
             [clojure.data.xml :refer [parse emit]]
             [clojure.zip :refer [xml-zip root edit node]]

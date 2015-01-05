@@ -1,5 +1,8 @@
-(ns elite-mfd.server
-  (:require [cheshire.core :refer [generate-string]])
+(ns ^{:author "Daniel Leong"
+      :doc "The websocket server"}
+  elite-mfd.server
+  (:require [cheshire.core :refer [generate-string]]
+            [elite-mfd.core-api :refer [get-system-stations]])
   (:use org.httpkit.server)
   (:gen-class))
 
@@ -28,8 +31,8 @@
 (defn to-client
   [client obj]
   "Send a clj map as JSON to the client"
-  ; right now, just a wrapper; we may want to
-  ;  do some post-processing, however...
+  ;; right now, just a wrapper; we may want to
+  ;;  do some post-processing, however...
   (send! client (generate-string obj)))
 
 (defn to-all
@@ -40,7 +43,10 @@
 
 (defn notify-system
   [client system]
-  (to-client client {:type :on-system :system system}))
+  (to-client client
+             {:type :on-system
+              :system system
+              :stations (get-system-stations system)}))
 
 (defn- create-handler
   [server]
@@ -52,16 +58,16 @@
                   (log "# lost client: " channel)
                   (remove-client server channel)))
 
-      ; handle the client
+      ;; handle the client
       (add-client server channel)
-      ; if we know the system, tell them
+      ;; if we know the system, tell them
       (if-let [system (:system @server)]
         (notify-system channel system))
 
       (on-receive channel 
                   (fn [data]
-                    ; TODO handle
-                    ; echo
+                    ;; TODO handle
+                    ;; echo for now
                     (send! channel data)))
       )))
 
@@ -79,5 +85,5 @@
   (dosync
     (alter server assoc :system system))
   (if-not (nil? system)
-    ; notify clients of system change
+    ;; notify clients of system change
     (each-client server #(notify-system % system))))
