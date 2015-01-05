@@ -3,7 +3,7 @@
   elite-mfd.trading
   (:require [cheshire.core :refer [parse-string]]
             [org.httpkit.client :as http]
-            [elite-mfd.util :refer [log to-client]]  
+            [elite-mfd.util :refer [log to-client client-error]]  
             [elite-mfd.core-api :refer [get-stations station-id]]))
 
 ;;
@@ -59,11 +59,23 @@
             (callback nil))
           (callback (:StationRoutes (parse-string body true))))))))
 
+(def calculate-packet-to-seq
+  "Take a packet map for on-calculate and turn it into a sequence"
+  [packet]
+  ; for now
+  (flatten (seq packet)))
+
 (defn on-calculate
   "Packet handler for :on-calculate"
   [ch packet]
   ; TODO implement
-  (to-client ch {:type "hi"}))
+  (if-let [station (:station-name packet)]
+    ; NB this seems overly complicated
+    (apply calculate-trades 
+           (flatten (conj [station] 
+                          (calculate-packet-to-seq packet)
+                          :callback #(to-client ch %))))
+    (client-error ch "Must specify starting station")))
 
 (defn register-handlers
   "Interface used by server for registering websocket packet handlers"

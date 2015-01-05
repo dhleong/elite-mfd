@@ -53,8 +53,7 @@
         (fn [result]
           (is (vector? result))
           (is (not (empty? result)))
-          (is (= 2104 (-> result first :Total))) 
-          ))))
+          (is (= 2104 (-> result first :Total)))))))
   (testing "Request Error"
     (with-fake-http [#".*" 400] ; server didn't like it
       (do-test

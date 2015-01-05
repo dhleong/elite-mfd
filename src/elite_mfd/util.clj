@@ -23,6 +23,13 @@
   (each-client server 
     #(to-client % message)))
 
+(defn client-error
+  [client message]
+  "Send an error message to the client"
+  ;; right now, just a wrapper; we may want to
+  ;;  do some post-processing, however...
+  (to-client client {:type "error" :error message}))
+
 (defn log [& msg]
   "Global log utility"
   (apply println msg))
