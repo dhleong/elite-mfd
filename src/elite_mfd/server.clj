@@ -3,8 +3,7 @@
   elite-mfd.server
   (:require [cheshire.core :refer [generate-string]]
             [elite-mfd.core-api :refer [get-system-stations]])
-  (:use org.httpkit.server)
-  (:gen-class))
+  (:use org.httpkit.server))
 
 (defn- log [& msg]
   (apply println msg))

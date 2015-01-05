@@ -13,36 +13,46 @@
 ;;
 ;; Globals
 ;;
+(defonce cached-stations (ref nil))
 (defonce cached-stations-map (ref nil))
 
 (defn- log [& msg]
   (apply println msg))
 
-
 (defn parse-stations-map
-  [raw]
-  (when-let [array (parse-string raw true)]
-    (reduce
-      (fn [smap info]
-        (let [station (:Station info)
-              system-name (:System info) ]
-          (assoc smap 
-                 system-name
-                 (conj (get smap system-name [])
-                       station))))
-      {} array)))
+  [array]
+  (reduce
+    (fn [smap info]
+      (let [station (:Station info)
+            system-name (:System info) ]
+        (assoc smap 
+               system-name
+               (conj (get smap system-name [])
+                     station))))
+    {} array))
 
 (defn ensure-stations-cached []
-  (when (nil? @cached-stations-map)
+  (when (nil? @cached-stations)
     (let [{:keys [status body error] :as resp} @(http/get stations-url)]
       (if error
         (log "Could not get stations:" error)
-        (dosync (ref-set cached-stations-map (parse-stations-map body)))))))
+        (when-let [array (parse-string body true)]
+          (dosync 
+            (ref-set cached-stations array)
+            (ref-set cached-stations-map (parse-stations-map array))))))))
 
 (defn get-system-stations
   "Get the names of stations within a given system"
   [system]
   (ensure-stations-cached)
   (if-let [cached @cached-stations-map]
-    (get @cached-stations-map system []) 
+    (get cached system []) 
     [])) ; network issue? be graceful
+
+(defn get-stations
+  "Returns a raw array of Station info maps"
+  []
+  (ensure-stations-cached)
+  (if-let [cached @cached-stations]
+    cached 
+    [])) ; network issue? be graceful 
