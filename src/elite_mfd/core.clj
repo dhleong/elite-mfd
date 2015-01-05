@@ -7,6 +7,7 @@
             [clojure.data.zip.xml :as c-d-z-xml
              :refer [xml-> xml1-> attr attr= text]]
             [clojure.java.io :refer [file reader writer]]
+            [elite-mfd.util :refer [log]] 
             [elite-mfd.server :refer [create-server set-system]])
   (:import  [java.io RandomAccessFile])
   (:gen-class))
@@ -28,9 +29,6 @@
 (def app-config-backup-path (file product-dir "AppConfig.xml.bak"))
 (def logs-dir (file product-dir "Logs"))
 
-(defn- log [& msg]
-  (apply println msg))
-
 (defn fix-config-reader [in]
   "Ensure the AppConfig.xml file is fixed.
    Returns nil if it's good, else the root Element with the attribute added"
@@ -43,13 +41,14 @@
 
 (defn- fix-config []
   "Ensure the AppConfig.xml file is fixed"
-  (when-let [el (with-open [in (reader app-config-path)]
-                (fix-config-reader in))]
-    ; backup the file...
-    (spit app-config-backup-path (slurp app-config-path))
-    ; ... because our replacement trashes the formatting
-    (with-open [out (writer app-config-path)]
-      (emit el out))))
+  (when (.exists app-config-path)
+    (when-let [el (with-open [in (reader app-config-path)]
+                    (fix-config-reader in))]
+      ; backup the file...
+      (spit app-config-backup-path (slurp app-config-path))
+      ; ... because our replacement trashes the formatting
+      (with-open [out (writer app-config-path)]
+        (emit el out)))))
 
 (defn pick-log-file []
   "Pick most recent netLog file"
@@ -76,10 +75,13 @@
   "Polls for changes in the system 
   and calls the predicate when it changed"
   (let [in (pick-log-file)]
-    (log "Reading " (.getAbsolutePath in))
-    (doseq [line (tail-seq in)]
-      ; TODO extract system name from line
-      (pred line))))
+    ; FIXME no log yet? look for one.
+    ; FIXME ALSO, if a better log shows up, switch to it
+    (when (and in (.exists in))
+      (log "Reading " (.getAbsolutePath in))
+      (doseq [line (tail-seq in)]
+        ; TODO extract system name from line
+        (pred line)))))
 
 (defn -main
   "I don't do a whole lot ... yet."
@@ -88,6 +90,7 @@
   (fix-config)
   (log "Starting")
   (defonce nrepl-server (start-server :port nrepl-port))
+  (log "Repl available on" nrepl-port)
   (let [server (create-server server-port)
         system-callback #(set-system server %)
         system-poll-future (future (system-poller system-callback))]

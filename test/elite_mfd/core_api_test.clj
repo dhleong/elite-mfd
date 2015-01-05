@@ -23,5 +23,8 @@
    (let [smap (parse-stations-map simple-stations-array)]
      (is (= 1 (count (get smap "Ross 41"))))
      (is (= 2 (count (get smap "Lalande 4141"))))
-     (is (= "Aaronson Landing" (first (get smap "Hehebeche"))))
-     )))
+     (is (= "Aaronson Landing" (first (get smap "Hehebeche"))))))
+  (testing "station-id works"
+    (is (nil? (station-id nil)))
+    (is (= 5200 (station-id "Aaronson Landing")))))
+

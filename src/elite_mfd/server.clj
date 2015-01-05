@@ -1,12 +1,11 @@
 (ns ^{:author "Daniel Leong"
       :doc "The websocket server"}
   elite-mfd.server
-  (:require [cheshire.core :refer [generate-string]]
-            [elite-mfd.core-api :refer [get-system-stations]])
+  (:require [cheshire.core :refer [generate-string parse-string]]
+            [elite-mfd.util :refer [log each-client to-client]]
+            [elite-mfd.core-api :refer [get-system-stations]]
+            [elite-mfd.trading :as trading])
   (:use org.httpkit.server))
-
-(defn- log [& msg]
-  (apply println msg))
 
 (defn add-client
   [server client]
@@ -22,24 +21,6 @@
       assoc-in [:clients] 
       (remove #(= % client) (:clients @server)))))
 
-(defn each-client
-  "Perform (pred client) for all clients connected"
-  [server pred]
-  (doall (map pred (:clients @server))))
-
-(defn to-client
-  [client obj]
-  "Send a clj map as JSON to the client"
-  ;; right now, just a wrapper; we may want to
-  ;;  do some post-processing, however...
-  (send! client (generate-string obj)))
-
-(defn to-all
-  "Send a message to all connected clients of the server"
-  [server message]
-  (each-client server 
-    #(to-client % message)))
-
 (defn notify-system
   [client system]
   (to-client client
@@ -48,33 +29,37 @@
               :stations (get-system-stations system)}))
 
 (defn- create-handler
-  [server]
+  [server handlers]
   (fn [request]
     (with-channel request channel
       (log "* new client: " channel)
+      (log "hi")
       (on-close channel
                 (fn [status]
                   (log "# lost client: " channel)
                   (remove-client server channel)))
-
       ;; handle the client
       (add-client server channel)
       ;; if we know the system, tell them
       (if-let [system (:system @server)]
         (notify-system channel system))
-
+      ;; pass incoming packets to registered handlers
       (on-receive channel 
                   (fn [data]
-                    ;; TODO handle
-                    ;; echo for now
-                    (send! channel data)))
-      )))
+                    (if-let [json (parse-string data true)]
+                      (if-let [handler (-> json :type keyword handlers)]
+                        (handler channel json)
+                        (log "Unhandled packet:" json))
+                      (log "Invalid json:" data)))))))
 
 (defn create-server
   "Initialize a server"
   [port]
-  (let [server (ref {:clients [] :system nil})]
-    (run-server (create-handler server) {:port port})
+  (let [server (ref {:clients [] :system nil})
+        handlers (-> {}
+                     trading/register-handlers)]
+    (run-server (create-handler server handlers) {:port port})
+    (println "Server listening on" port)
     server))
 
 (defn set-system

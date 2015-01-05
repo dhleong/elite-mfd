@@ -2,7 +2,8 @@
       :doc "API calls/utils, etc. that are used in the core app"}
   elite-mfd.core-api
   (:require [cheshire.core :refer [parse-string]]
-            [org.httpkit.client :as http]))
+            [org.httpkit.client :as http]
+            [elite-mfd.util :refer [log]]))
 
 ;;
 ;; Constants
@@ -15,9 +16,6 @@
 ;;
 (defonce cached-stations (ref nil))
 (defonce cached-stations-map (ref nil))
-
-(defn- log [& msg]
-  (apply println msg))
 
 (defn parse-stations-map
   [array]
@@ -56,3 +54,15 @@
   (if-let [cached @cached-stations]
     cached 
     [])) ; network issue? be graceful 
+
+(defn station-id
+  "Returns the id of a station from its name"
+  [station-name]
+  ; NB if performance becomes a problem, we can certainly cache this as well...
+  (if (nil? station-name)
+    nil ; quick shortcut
+    (:StationId
+      (first 
+        (filter 
+          #(= station-name (:Station %))
+          (get-stations))))))
