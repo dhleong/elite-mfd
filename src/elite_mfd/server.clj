@@ -28,28 +28,27 @@
               :system system
               :stations (get-system-stations system)}))
 
-(defn- create-handler
-  [server handlers]
-  (fn [request]
-    (with-channel request channel
-      (log "* new client: " channel)
-      (on-close channel
-                (fn [status]
-                  (log "# lost client: " channel)
-                  (remove-client server channel)))
-      ;; handle the client
-      (add-client server channel)
-      ;; if we know the system, tell them
-      (if-let [system (:system @server)]
-        (notify-system channel system))
-      ;; pass incoming packets to registered handlers
-      (on-receive channel 
-                  (fn [data]
-                    (if-let [json (parse-string data true)]
-                      (if-let [handler (-> json :type keyword handlers)]
-                        (handler channel json)
-                        (log "Unhandled packet:" json))
-                      (log "Invalid json:" data)))))))
+(defn- client-handler
+  [server handlers request]
+  (with-channel request channel
+    (log "* new client: " channel)
+    (on-close channel
+              (fn [status]
+                (log "# lost client: " channel)
+                (remove-client server channel)))
+    ;; handle the client
+    (add-client server channel)
+    ;; if we know the system, tell them
+    (if-let [system (:system @server)]
+      (notify-system channel system))
+    ;; pass incoming packets to registered handlers
+    (on-receive channel 
+                (fn [data]
+                  (if-let [json (parse-string data true)]
+                    (if-let [handler (-> json :type keyword handlers)]
+                      (handler channel json)
+                      (log "Unhandled packet:" data))
+                    (log "Invalid json:" data))))))
 
 (defn create-server
   "Initialize a server"
@@ -57,8 +56,8 @@
   (let [server (ref {:clients [] :system nil})
         handlers (-> {}
                      trading/register-handlers)]
-    (run-server (create-handler server handlers) {:port port})
-    (println "Server listening on" port)
+    (run-server (partial client-handler server handlers) {:port port})
+    (println "Websockets listening on" port)
     server))
 
 (defn set-system

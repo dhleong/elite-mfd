@@ -1,0 +1,77 @@
+<a href="#/home">Home</a>
+
+<div>
+    <div class="title">
+        Trading from {{ station }}
+    </div>
+
+    <form class="simple-form" ng-submit="onCalculate()">
+        <table>
+            <tr>
+                <td>Destination</td>
+                <td>
+                    <!-- TODO: Auto-complete -->
+                    <input type="text" class="text" placeholder="Destination (optional)" ng-model="form['station-name-end']">
+                </td>
+            </tr>
+
+            <tr>
+                <td>Cash</td>
+                <td>
+                    <input type="text" class="text" ng-model="form.cash">
+                </td>
+            </tr>
+
+            <tr>
+                <td>Cargo Capacity</td>
+                <td>
+                    <input type="text" class="text" ng-model="form.cargo">
+                </td>
+            </tr>
+
+            <tr>
+                <td>Min. Profit</td>
+                <td>
+                    <input type="text" class="text" ng-model="form['min-profit']">
+                </td>
+            </tr>
+
+            <tr>
+                <td>Pad Size</td>
+                <td>
+                    <select ng-model="form['pad-size']" ng-options="size for size in validSizes">
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Search Range</td>
+                <td>
+                    <select ng-model="form['search-range']" ng-options="range for range in validRanges">
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <input type="submit" class="text" value="Calculate" name="">
+    </form>
+
+    <div ng-show="results != null" class="results">
+        <!-- TODO tap trade to calculate route? -->
+        <div ng-hide="results.length">No trades found</div>
+        <div ng-repeat="trade in results">
+            <div class="commodity">
+                Buy ({{ trade.Qty }}) {{ trade.CommodityName }} @ {{ trade.Buy }}
+            </div>
+            <div class="destination">
+                Sell at: <span class="station">{{ trade.DestinationStationName }}</span>
+                in <span class="system">{{ trade.DestinationSystemName }}</span>
+                (Distance: {{ trade.Distance }})
+            <div class="profit">
+                For total profit: {{ trade.Total }}
+            </div>
+            <div class="update">
+                Last Updated: {{ trade.SellLastUpdate }}
+            </div>
+        </div>
+    </div>
+</div>

@@ -7,8 +7,13 @@
             [clojure.data.zip.xml :as c-d-z-xml
              :refer [xml-> xml1-> attr attr= text]]
             [clojure.java.io :refer [file reader writer]]
-            [elite-mfd.util :refer [log]] 
-            [elite-mfd.server :refer [create-server set-system]])
+            [org.httpkit.server :refer [run-server]]
+            [compojure
+              [core :refer [defroutes GET]]
+              [route :as route]]
+            [elite-mfd
+              [util :refer [log]] 
+              [server :refer [create-server set-system]]])
   (:import  [java.io RandomAccessFile])
   (:gen-class))
 
@@ -17,7 +22,8 @@
 ;
 ; FIXME actual path
 (def product-root (file (System/getProperty "user.home") "Desktop"))
-(def server-port 9876)
+(def http-port 9876)
+(def websockets-port 9877)
 (def nrepl-port 7888)
 
 ;
@@ -83,15 +89,30 @@
         ; TODO extract system name from line
         (pred line)))))
 
+(defn- wrap-dir-index
+  "Middleware to reroute / to /index.html"
+  [handler]
+  (fn [req]
+    (handler
+     (update-in req [:uri]
+                #(if (= "/" %) "/index.html" %)))))
+
+(defroutes http-routes
+  (route/resources "/"))
+
 (defn -main
-  "I don't do a whole lot ... yet."
+  "Start up all the things"
   [& args]
   ; make sure we're config'd correctly
   (fix-config)
   (log "Starting")
   (defonce nrepl-server (start-server :port nrepl-port))
   (log "Repl available on" nrepl-port)
-  (let [server (create-server server-port)
+  (run-server (-> http-routes
+                  wrap-dir-index)
+              {:port http-port})
+  (log "Http listening on " http-port)
+  (let [server (create-server websockets-port)
         system-callback #(set-system server %)
         system-poll-future (future (system-poller system-callback))]
     @system-poll-future

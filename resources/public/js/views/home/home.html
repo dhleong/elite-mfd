@@ -1,0 +1,15 @@
+<div>
+    <div class="system">{{ info ? info.system : "Current System Unavailable" }}</div>
+
+    <!-- TODO ? -->
+    <!-- <ul class="nav" ng&#45;if="info"> -->
+    <!--     <a href="#/trading">Trade Calculator</a> -->
+    <!-- </ul> -->
+
+    <div ng-if="info" class="stations">
+        <div ng-repeat="station in info.stations"
+                class="station" ng-click="selectStation(station)">
+            <div class="station-name">{{ station }}</div>
+        </div>
+    </div>
+</div>

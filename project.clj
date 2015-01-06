@@ -9,7 +9,8 @@
                  [org.clojure/data.zip "0.1.1"]
                  [http-kit "2.1.16"]
                  [http-kit.fake "0.2.1"]
-                 [cheshire "5.4.0"]]
+                 [cheshire "5.4.0"]
+                 [compojure "1.1.8"]]
   :main ^:skip-aot elite-mfd.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
