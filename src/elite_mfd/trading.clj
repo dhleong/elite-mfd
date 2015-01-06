@@ -1,7 +1,7 @@
 (ns ^{:author "Daniel Leong"
       :doc "Trading module based on elitetradingtool.co.uk"}
   elite-mfd.trading
-  (:require [cheshire.core :refer [parse-string]]
+  (:require [cheshire.core :refer [generate-string parse-string]]
             [org.httpkit.client :as http]
             [elite-mfd.util :refer [log to-client client-error]]  
             [elite-mfd.core-api :refer [get-stations station-id]]))
@@ -51,24 +51,25 @@
                       :StartStationId (station-id station-name-start)}]
     (http/post 
       calculate-url
-      {:content-type :json :body request-body}
+      {:headers {"Content-Type" "application/json"}
+       :body (generate-string request-body)}
       (fn [{:keys [error body]}]
+        (println body (generate-string request-body))
         (if error
           (do 
             (log "! Error calculating:" error "Request:" request-body)
             (callback nil))
           (callback (:StationRoutes (parse-string body true))))))))
 
-(def calculate-packet-to-seq
+(defn calculate-packet-to-seq
   "Take a packet map for on-calculate and turn it into a sequence"
   [packet]
-  ; for now
-  (flatten (seq packet)))
+  ; should be sufficient for now
+  (flatten (seq (dissoc packet :type :station-name))))
 
 (defn on-calculate
   "Packet handler for :on-calculate"
   [ch packet]
-  ; TODO implement
   (if-let [station (:station-name packet)]
     ; NB this seems overly complicated
     (apply calculate-trades 

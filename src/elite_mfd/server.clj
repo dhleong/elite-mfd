@@ -33,7 +33,6 @@
   (fn [request]
     (with-channel request channel
       (log "* new client: " channel)
-      (log "hi")
       (on-close channel
                 (fn [status]
                   (log "# lost client: " channel)
