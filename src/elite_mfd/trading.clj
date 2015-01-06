@@ -54,7 +54,6 @@
       {:headers {"Content-Type" "application/json"}
        :body (generate-string request-body)}
       (fn [{:keys [error body]}]
-        (println body (generate-string request-body))
         (if error
           (do 
             (log "! Error calculating:" error "Request:" request-body)
@@ -68,14 +67,16 @@
   (flatten (seq (dissoc packet :type :station-name))))
 
 (defn on-calculate
-  "Packet handler for :on-calculate"
+  "Packet handler for :calculate"
   [ch packet]
   (if-let [station (:station-name packet)]
     ; NB this seems overly complicated
     (apply calculate-trades 
            (flatten (conj [station] 
                           (calculate-packet-to-seq packet)
-                          :callback #(to-client ch %))))
+                          :callback #(to-client ch 
+                                                {:type :calculate-result
+                                                 :result %}))))
     (client-error ch "Must specify starting station")))
 
 (defn register-handlers

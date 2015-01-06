@@ -104,6 +104,11 @@
         @(on-calculate ch basic-calculate-packet)
         (let [sent (get-sent ch)]
           (is (= 1 (count sent))) ; only one sent packet
+          (is (= "calculate-result" (-> sent first :type)))
+          (is (= 1 (count (-> sent
+                              first
+                              :result))))
           (is (= 2104 (-> sent 
                           first ; the packet
+                          :result
                           first :Total))))))))
