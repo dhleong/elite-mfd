@@ -1,5 +1,6 @@
 <div>
-    <div class="system">{{ info ? info.system : "Current System Unavailable" }}</div>
+    <div class="error" ng-hide="info">Current System Unavailable</div>
+    <div class="system" ng-show="info">Welcome to {{ info.system }}</div>
 
     <!-- TODO ? -->
     <!-- <ul class="nav" ng&#45;if="info"> -->

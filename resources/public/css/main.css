@@ -1,3 +1,13 @@
+a.nav {
+    display: block;
+    padding: 8px;
+}
+
+div.station {
+    padding: 12px;
+    cursor: pointer;
+}
+
 .hidden {
     display: none;
 }

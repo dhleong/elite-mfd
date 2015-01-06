@@ -65,7 +65,12 @@ function websocket(url, s) {
         ws._settings.global_events[eventName] = handler;
     };
 
-    /** NB: Completely overrides any previously-registered locals! */
+    /**
+     * NB: Completely overrides any previously-registered locals!
+     * @param $scope The scope of the current view. Event
+     *  callbacks will be fired within $scope.$apply() so
+     *  updates to bound variables will be reflected as expected
+     */
     ws.registerLocal = function($scope, events) {
         ws._settings.$scope = $scope;
         ws._settings.current_events = events;
@@ -85,9 +90,14 @@ function websocket(url, s) {
 
 angular.module('emfd')
 .provider('websocket', function() {
-    console.log("create socket");
 
-    this.socket = websocket("ws://localhost:" + WEBSOCKET_PORT, {
+    var host = window.location.host;
+    var portStart = host.lastIndexOf(':');
+    if (~portStart) {
+        host = host.substring(0, portStart);
+    }
+    var url = "ws://" + host + ":" + WEBSOCKET_PORT
+    this.socket = websocket(url, {
         open: function() {
             console.log("Connected");
         }
@@ -98,7 +108,6 @@ angular.module('emfd')
 
     var self = this;
     this.$get = function() {
-        console.log("Get socket");
         return self.socket;
     };
 });
