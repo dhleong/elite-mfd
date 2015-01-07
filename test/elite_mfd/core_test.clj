@@ -34,6 +34,9 @@
 (def has-logging-reader
   (java.io.StringReader. has-logging))
 
+(def system-log-line
+  "{00:38:48} System:21(Eravate) Body:50 Pos:(-643.133,465.037,-608.375)")
+
 (deftest test-fix-config
   (testing "fix AppConfig.xml"
     (let [result (fix-config-reader missing-logging-reader)]
@@ -44,3 +47,7 @@
                    (attr= :VerboseLogging "1"))))))
   (testing "nop for fixed AppConfig.xml"
     (is (= nil (fix-config-reader has-logging-reader))))) 
+
+(deftest system-extraction
+  (testing "System name extractor"
+    (is (= "Eravate" (extract-system-name system-log-line)))))

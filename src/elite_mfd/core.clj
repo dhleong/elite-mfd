@@ -77,6 +77,13 @@
   (let [raf (RandomAccessFile. input "r")]
     (raf-seq raf)))
 
+;; is the Body useful?
+(def system-matcher #"System:\d+\((?<System>[^\)]+)\) Body:")
+(defn extract-system-name [line]
+  (when-let [match (.matcher system-matcher line)]
+    (when (.find match)
+      (.group match "System"))))
+
 (defn system-poller [pred]
   "Polls for changes in the system 
   and calls the predicate when it changed"
@@ -86,8 +93,8 @@
     (when (and in (.exists in))
       (log "Reading " (.getAbsolutePath in))
       (doseq [line (tail-seq in)]
-        ; TODO extract system name from line
-        (pred line)))))
+        (if-let [system (extract-system-name line)]
+          (pred system))))))
 
 (defn- wrap-dir-index
   "Middleware to reroute / to /index.html"
