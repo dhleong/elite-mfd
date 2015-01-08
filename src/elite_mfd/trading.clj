@@ -11,7 +11,12 @@
 ;;
 (def calculate-url 
   "http://www.elitetradingtool.co.uk/api/EliteTradingTool/Calculator")
+(def search-url 
+  "http://www.elitetradingtool.co.uk/api/EliteTradingTool/Search")
 
+;;
+;; Util methods
+;;
 (defn filter-stations
   "Return an array of stations matching the given name
   The system name is also matched"
@@ -26,6 +31,9 @@
             (.contains system-name input))))
       (get-stations))))
 
+;;
+;; API calls
+;;
 (defn calculate-trades
   "Call the trade calculator to request best trades
    starting at the given station and (optionally)
@@ -58,8 +66,41 @@
           (do 
             (log "! Error calculating:" error "Request:" request-body)
             (callback nil))
+          ; TODO parse results to a friendly format so any changes
+          ;  to the service's format are transparent to clients
           (callback (:StationRoutes (parse-string body true))))))))
 
+(defn search-stations
+  "Call the station searcher with various filters"
+  [system-name &
+   {:keys [callback commodity-id pad-size search-type search-range]
+    :or {callback identity
+         commodity-id nil
+         pad-size "Small"
+         search-type "Station Selling" ; or "Station Buying"; req for commodity-id
+         search-range "15"}}]
+  (let [request-body {:CurrentLocation system-name
+                      :Commodity (if commodity-id true false)
+                      :CommodityId commodity-id
+                      :PadSize pad-size
+                      :SearchType search-type
+                      :SearchRange search-range}]
+    (println request-body)
+    (http/post 
+      search-url
+      {:headers {"Content-Type" "application/json"}
+       :body request-body}
+      (fn [{:keys [error body]}]
+        (println body)
+        (if error
+          (do 
+            (log "! Error searching" error "Request:" request-body)
+            (callback nil))
+          (callback (:Results (parse-string body true))))))))
+
+;;
+;; Packet handlers and related
+;;
 (defn calculate-packet-to-seq
   "Take a packet map for on-calculate and turn it into a sequence"
   [packet]
@@ -79,8 +120,24 @@
                                                  :result %}))))
     (client-error ch "Must specify starting station")))
 
+(defn on-search
+  "Packet handler for :search"
+  [ch packet]
+  ; TODO implement
+  (if-let [system (:system packet)]
+    ; NB this seems overly complicated
+    (apply search-stations
+           (flatten (conj [system] 
+                          (calculate-packet-to-seq packet)
+                          :callback #(to-client ch %))))
+    (client-error ch "Must specify system")))
+
+;;
+;; Registration
+;;
 (defn register-handlers
   "Interface used by server for registering websocket packet handlers"
   [handlers]
   (assoc handlers
-         :calculate on-calculate))
+         :calculate on-calculate
+         :search on-search))

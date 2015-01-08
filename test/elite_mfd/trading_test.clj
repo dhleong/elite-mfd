@@ -26,23 +26,32 @@
    :station-name-end "Bar"
    })
 
-;;
-;; Util methods
-;;
-(defn- filter-stations-search
-  "Returns a set containing the results
-  of (filter-stations) with the given input,
-  and extracting the given field"
-  [input & {:keys [field] :or {field :Station}}]
-  (set 
-    (map #(get % field)
-         (filter-stations input))))
+;; brace yourself...
+(def dummy-search-result
+  "{\"Results\":[{
+  \"SystemName\":\"Eravate\",\"Buy\":0,\"Sell\":176,\"LastUpdate\":\"15h 38m ago\",
+  \"Station\":{\"Id\":1008,\"Name\":\"Sylvester City\",\"SystemId\":1048,\"EconomyId\":4,
+  \"Economy\":{\"Id\":4,\"Name\":\"Industrial\"},
+  \"SecondaryEconomyId\":null,\"SecondaryEconomy\":null,\"GovernmentId\":5,\"Government\":null,
+  \"AllegianceId\":4,\"Allegiance\":null,\"HasBlackmarket\":false,
+  \"HasMarket\":true,\"HasOutfitting\":false,\"HasShipyard\":false,\"HasRepairs\":true,
+  \"DistanceFromJumpIn\":496.0,\"Version\":1.0,\"StationTypeId\":6,
+  \"StationType\":{\"Id\":6,\"Name\":\"Industrial Outpost\",\"PrimaryType\":2,
+  \"PadSmall\":true,\"PadMedium\":true,\"PadLarge\":false,\"Pads\":\"Small, Medium\"},
+  \"StationCommodities\":[{\"Id\":46592,\"StationId\":1008,\"CommodityId\":59,\"Commodity\":null,\"Buy\":0,\"Sell\":176,\"LastUpdate\":\"2015-01-07T02:12:41.643\",\"UpdatedBy\":\"BearOverlord\",\"Version\":1.0}],
+  \"Services\":\"Commodities Market, Repairs\",\"EconomyString\":\"Industrial\"},
+  \"System\":{\"Id\":1048,\"Name\":\"Eravate\",\"GovernmentId\":5,
+  \"Government\":{\"Id\":5,\"Name\":\"Democracy\"},\"AllegianceId\":4,
+  \"Allegiance\":{\"Id\":4,\"Name\":\"Independent\"},
+  \"X\":-42.4375,\"Y\":-3.15625,\"Z\":59.65625,\"Version\":1.0,\"DevData\":false,
+  \"Checked\":false,\"CheckedDate\":null,
+  \"CheckedBy\":\"\",\"Economy\":\"Industrial\"},
+  \"Distance\":0.0}]}")
 
-(defn- do-test
-  "Test the async calculate-trades method"
-  [test-callback]
+
+(defn- do-test [func test-callback]
   (let [called (ref false)
-        result @(calculate-trades
+        result @(func
                   "Ackerman Market"
                   :callback (fn [result]
                               (dosync (ref-set called true))
@@ -77,14 +86,14 @@
   (testing "Simple request"
     ; stub the http... wherever it's going, return the expected response
     (with-fake-http [#".*" dummy-calculation-result]
-      (do-test 
+      (do-test calculate-trades
         (fn [result]
           (is (vector? result))
           (is (not (empty? result)))
           (is (= 2104 (-> result first :Total)))))))
   (testing "Request Error"
     (with-fake-http [#".*" 400] ; server didn't like it
-      (do-test
+      (do-test calculate-trades
         (fn [result]
           (is (nil? result)))))))
 
@@ -112,3 +121,19 @@
                           first ; the packet
                           :result
                           first :Total))))))))
+
+(deftest test-search
+  (testing "Simple request"
+    ; stub the http... wherever it's going, return the expected response
+    (with-fake-http [#".*" dummy-search-result]
+      (do-test search-stations
+        (fn [result]
+          (is (vector? result))
+          (is (not (empty? result)))
+          (is (= "Eravate" (-> result first :SystemName)))))))
+  (testing "Request Error"
+    (with-fake-http [#".*" 400] ; server didn't like it
+      (do-test search-stations
+        (fn [result]
+          (is (nil? result)))))))
+
