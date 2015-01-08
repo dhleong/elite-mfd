@@ -36,6 +36,8 @@
 
 (def system-log-line
   "{00:38:48} System:21(Eravate) Body:50 Pos:(-643.133,465.037,-608.375)")
+(def system-log-line2
+  "{00:38:48} System:21(Yakabugai) Body:50 Pos:(-643.133,465.037,-608.375)")
 
 (deftest test-fix-config
   (testing "fix AppConfig.xml"
@@ -51,3 +53,52 @@
 (deftest system-extraction
   (testing "System name extractor"
     (is (= "Eravate" (extract-system-name system-log-line)))))
+
+(defn- string-reader [in]
+  (java.io.BufferedReader.
+    (java.io.StringReader. in)))
+
+(deftest test-system-poller-loop
+  (testing "First run"
+    (let [last-system (ref nil)
+          [file stream] (system-poller-loop 
+                          nil nil  ; no last-file/stream yet
+                          :pick-log #(identity "file1")
+                          :open-log (fn [&_] (string-reader system-log-line))
+                          :callback #(dosync (ref-set last-system %)))]
+      (is (= file "file1"))
+      (is (not (nil? stream)))
+      (is (= "Eravate" @last-system))))
+  (testing "Keep Reading"
+    (let [last-system (ref nil)
+          last-stream (string-reader system-log-line)
+          [file stream] (system-poller-loop
+                          "file1" last-stream
+                          :pick-log #(identity "file1")
+                          :open-log #(is (nil? %)) ; should not be called
+                          :callback #(dosync (ref-set last-system %))) ]
+      (is (= "file1" file))
+      (is (= last-stream stream)) ; same stream
+      (is (= "Eravate" @last-system))))
+  (testing "Do nothing on none left"
+    (let [last-system (ref nil)
+          last-stream (string-reader "")
+          [file stream] (system-poller-loop
+                          "file1" last-stream
+                          :pick-log #(identity "file1")
+                          :open-log #(is (nil? %)) ; should not be called
+                          :callback #(dosync (ref-set last-system %)))]
+      (is (= "file1" file)) ; same
+      (is (= last-stream stream)) ; same
+      (is (nil? @last-system))))
+  (testing "Switch to new file"
+    (let [last-system (ref nil)
+          last-stream (string-reader system-log-line)
+          [file stream] (system-poller-loop
+                          "file1" last-stream
+                          :pick-log #(identity "file2")
+                          :open-log (fn [&_] (string-reader system-log-line2))
+                          :callback #(dosync (ref-set last-system %)))]
+      (is (= "file2" file)) ; new!
+      (is (not= last-stream stream)) ; new!
+      (is (= "Yakabugai" @last-system)))))

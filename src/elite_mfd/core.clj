@@ -66,16 +66,10 @@
         sort
         last)))
 
-(defn- raf-seq
-  [#^RandomAccessFile raf]
-  (if-let [line (.readLine raf)]
-    (lazy-seq (cons line (raf-seq raf)))
-    (do (Thread/sleep 1000)
-        (recur raf))))
-
-(defn- tail-seq [input]
-  (let [raf (RandomAccessFile. input "r")]
-    (raf-seq raf)))
+(defn- slurp-lines
+  [stream]
+  (if-let [line (.readLine stream)]
+    (lazy-seq (cons line (slurp-lines stream)))))
 
 ;; is the Body useful?
 (def system-matcher #"System:\d+\((?<System>[^\)]+)\) Body:")
@@ -84,17 +78,41 @@
     (when (.find match)
       (.group match "System"))))
 
+(defn system-poller-loop
+  "One loop of the system-poller"
+  [last-file last-stream & {:keys [pick-log open-log callback] :as opts}]
+  (let [new-file (pick-log)]
+    (if (= new-file last-file)
+      ; same file; keep reading
+      (do
+        (doseq [line (slurp-lines last-stream)]
+          (if-let [system (extract-system-name line)]
+            (callback system)))
+        ; return file/stream as deconstructable vector
+        [last-file last-stream])
+      ; else, new file; open and start over
+      (do
+        (if-not (nil? last-stream)
+          (.close last-stream))
+        (println "Discovered new log " new-file)
+        (recur new-file (open-log new-file) opts)))))
+
 (defn system-poller [pred]
   "Polls for changes in the system 
   and calls the predicate when it changed"
-  (let [in (pick-log-file)]
-    ; FIXME no log yet? look for one.
-    ; FIXME ALSO, if a better log shows up, switch to it
-    (when (and in (.exists in))
-      (log "Reading " (.getAbsolutePath in))
-      (doseq [line (tail-seq in)]
-        (if-let [system (extract-system-name line)]
-          (pred system))))))
+  (let [opts {:pick-log pick-log-file
+              :open-log #(RandomAccessFile. % "r")
+              :callback pred }]
+    (loop [last-file nil
+           last-stream nil]
+      ; is there a better way to do this?!
+      (let [[new-file new-stream] (apply 
+                                    system-poller-loop
+                                    (flatten
+                                      (conj [last-file last-stream]
+                                            (seq opts))))]
+        (Thread/sleep 1000)
+        (recur new-file new-stream)))))
 
 (defn- wrap-dir-index
   "Middleware to reroute / to /index.html"
