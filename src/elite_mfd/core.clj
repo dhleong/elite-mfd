@@ -81,7 +81,7 @@
 (defn system-poller-loop
   "One loop of the system-poller"
   [last-file last-stream & {:keys [pick-log open-log callback] :as opts}]
-  (let [new-file (pick-log)]
+  (when-let [new-file (pick-log)]
     (if (= new-file last-file)
       ; same file; keep reading
       (do
