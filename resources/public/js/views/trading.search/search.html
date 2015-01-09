@@ -1,44 +1,54 @@
-<a href="#/home" class="nav">Home</a>
+<div ui-content-for="title">
+    Search near {{ system }}
+</div>
 
-<div>
-    <div class="title">
-        Search near {{ system }}
-    </div>
+<div ui-content-for="navbutton-left">
+    <a href="#/">Back</a>
+</div>
 
-    <form class="simple-form" ng-submit="onSearch()">
-        <table>
+<div class="scrollable">
+    <div class="scrollable-content">
 
-            <tr>
-                <td>Your Ship Size</td>
-                <td>
-                    <select ng-model="form['pad-size']" ng-options="size for size in validSizes">
-                    </select>
-                </td>
-            </tr>
+        <div class="list-group">
 
-            <tr>
-                <td>Search Range</td>
-                <td>
-                    <select ng-model="form['search-range']" ng-options="range for range in validRanges">
-                    </select>
-                </td>
-            </tr>
-        </table>
-        <input type="submit" class="text" value="Calculate" name="">
-    </form>
+            <div class="list-group-item">
+                <form class="simple-form" ng-submit="onSearch()">
+                    <fieldset>
+                        <div class="form-group">
+                            <label>Your Ship Size</label>
+                            <select ng-model="form['pad-size']" ng-options="size for size in validSizes" class="form-control">
+                            </select>
+                        </div>
 
-    <div ng-show="results != null" class="results">
-        <!-- TODO tap trade to calculate route? -->
-        <div ng-hide="results.length">Nothing found</div>
-        <div ng-repeat="r in results">
-            <div class="location">
-                {{ r.SystemName }} ({{ r.Station.Name }})
-            </div>
+                        <div class="form-group">
+                            <label>Search Range</label>
+                            <select ng-model="form['search-range']" ng-options="range for range in validRanges" class="form-control">
+                            </select>
+                        </div>
+                    </fieldset>
+                    <button class="btn btn-primary btn-block">Search</button>
 
-            <div class="price" ng-if="form['commodity']">
-                {{ form['search-type'] == 'selling' ? r.Sell : r.Buy }}
+                    <div ui-content-for="navbutton-action">
+                        <a class='btn' ng-click='onSearch()'>Search</a>
+                    </div>
+                </form>
             </div>
         </div>
+
+        <div ng-show="results != null" class="list-group">
+            <!-- TODO tap trade to calculate route? -->
+            <div ng-hide="results.length" class="list-group-item">Nothing found</div>
+            <div ng-repeat="r in results" class="list-group-item">
+                <div class="location">
+                    {{ r.SystemName }} ({{ r.Station.Name }})
+                </div>
+
+                <div class="price" ng-if="form['commodity']">
+                    {{ form['search-type'] == 'selling' ? r.Sell : r.Buy }}
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 

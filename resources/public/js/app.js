@@ -3,6 +3,7 @@
 /* global angular */
 angular.module('emfd', [
     'ngRoute'
+  , 'mobile-angular-ui'
   , 'emfd.views.home'
   , 'emfd.views.trading'
   , 'emfd.views.trading.search'

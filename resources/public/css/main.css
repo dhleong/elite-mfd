@@ -1,6 +1,6 @@
-a.nav {
-    display: block;
-    padding: 8px;
+.home-heading {
+    margin: 0;
+    padding: .5em;
 }
 
 div.station {

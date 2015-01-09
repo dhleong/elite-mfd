@@ -1,16 +1,30 @@
-<div>
-    <div class="error" ng-hide="info">Current System Unavailable</div>
-    <div class="system" ng-show="info">Welcome to {{ info.system }}</div>
+<div ui-content-for="bottom-nav" ng-if="info">
+    <div class="btn-group justified" >
+        <a href="#/search/{{ info.system }}" class="btn btn-navbar">Search</a>
+    </div>
+</div>
 
-    <ul class="nav" ng-if="info">
-        <a href="#/search/{{ info.system }}" ng-show="info">Search near {{ info.system }}</a>
-        <!-- <a href="#/search" ng&#45;hide="info">Search</a> -->
-    </ul>
+<div class="scrollable">
+    <div class="scrollable-content">
 
-    <div ng-if="info" class="stations">
-        <div ng-repeat="station in info.stations"
-                class="station" ng-click="selectStation(station)">
-            <div class="station-name">{{ station }}</div>
+        <div class="list-group" ng-if="info">
+
+            <div class="list-group-item text-center">
+                <div>
+                    <h3 class="home-heading error" ng-hide="info">Current System Unavailable</span>
+                    <h3 class="home-heading" ng-show="info">Welcome to {{ info.system }}</span>
+                </div>
+
+                <div>
+                    <h4 class="home-heading">Nearby Stations:</h4>
+                </div>
+            </div>
+            <a ng-repeat="station in info.stations"
+                   class="list-group-item"
+                   href="#/trading/{{ station }}">
+               {{ station }} <i class="fa fa-chevron-right pull-right"></i>
+            </a>
         </div>
+
     </div>
 </div>

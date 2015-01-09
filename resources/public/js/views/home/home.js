@@ -15,10 +15,5 @@ angular.module('emfd.views.home', ['ngRoute'])
         '$scope', '$location', 'currentSystem', 
         function($scope, $location, info) {
     info.watch($scope, 'info');
-
-    $scope.selectStation = function(stationName) {
-        console.log("select", stationName);
-        $location.path('/trading/' + stationName);
-    };
 }]);
 

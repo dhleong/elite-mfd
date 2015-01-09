@@ -1,77 +1,80 @@
-<a href="#/home" class="nav">Home</a>
+<div ui-content-for="title">
+    Trading
+</div>
 
-<div>
-    <div class="title">
-        Trading from {{ station }}
-    </div>
+<div ui-content-for="navbutton-left">
+    <a href="#/">Back</a>
+</div>
 
-    <form class="simple-form" ng-submit="onCalculate()">
-        <table>
-            <tr>
-                <td>Destination</td>
-                <td>
-                    <!-- TODO: Auto-complete -->
-                    <input type="text" class="text" placeholder="Destination (optional)" ng-model="form['station-name-end']">
-                </td>
-            </tr>
+<div class="scrollable">
+    <div class="scrollable-content">
+        <div class="list-group">
+            <div class="list-group-item">
+                <form class="simple-form" ng-submit="onCalculate()">
+                    <fieldset>
+                        <legend>Trading from {{ station }}</legend>
+                        <div class="form-group">
+                            <label>Destination</label>
+                            <!-- TODO: Auto-complete -->
+                            <input type="text" class="form-control" placeholder="Destination (optional)" ng-model="form['station-name-end']">
+                        </div>
 
-            <tr>
-                <td>Cash</td>
-                <td>
-                    <input type="text" class="text" ng-model="form.cash">
-                </td>
-            </tr>
+                        <div class="form-group">
+                            <label>Cash</label>
+                            <input type="text" class="form-control" ng-model="form.cash">
+                        </div>
 
-            <tr>
-                <td>Cargo Capacity</td>
-                <td>
-                    <input type="text" class="text" ng-model="form.cargo">
-                </td>
-            </tr>
+                        <div class="form-group">
+                            <label>Cargo Capacity</label>
+                            <input type="number" class="form-control" ng-model="form.cargo">
+                        </div>
 
-            <tr>
-                <td>Min. Profit</td>
-                <td>
-                    <input type="text" class="text" ng-model="form['min-profit']">
-                </td>
-            </tr>
+                        <div class="form-group">
+                            <label>Min. Profit</label>
+                            <input type="number" class="form-control" ng-model="form['min-profit']">
+                        </div>
 
-            <tr>
-                <td>Your Ship Size</td>
-                <td>
-                    <select ng-model="form['pad-size']" ng-options="size for size in validSizes">
-                    </select>
-                </td>
-            </tr>
+                        <div class="form-group">
+                            <label>Your Ship Size</label>
+                            <select ng-model="form['pad-size']" ng-options="size for size in validSizes" class="form-control">
+                            </select>
+                        </div>
 
-            <tr>
-                <td>Search Range</td>
-                <td>
-                    <select ng-model="form['search-range']" ng-options="range for range in validRanges">
-                    </select>
-                </td>
-            </tr>
-        </table>
-        <input type="submit" class="text" value="Calculate" name="">
-    </form>
+                        <div class="form-group">
+                            <label>Search Range</label>
+                            <select ng-model="form['search-range']" ng-options="range for range in validRanges" class="form-control">
+                            </select>
+                        </div>
+                    </fieldset>
+                    <button class="btn btn-primary btn-block">Calculate Trades</button>
 
-    <div ng-show="results != null" class="results">
-        <!-- TODO tap trade to calculate route? -->
-        <div ng-hide="results.length">No trades found</div>
-        <div ng-repeat="trade in results">
-            <div class="commodity">
-                Buy ({{ trade.Qty }}) {{ trade.CommodityName }} @ {{ trade.Buy }}
-            </div>
-            <div class="destination">
-                Sell at: <span class="station">{{ trade.DestinationStationName }}</span>
-                in <span class="system">{{ trade.DestinationSystemName }}</span>
-                (Distance: {{ trade.Distance }})
-            <div class="profit">
-                For total profit: {{ trade.Total }}
-            </div>
-            <div class="update">
-                Last Updated: {{ trade.SellLastUpdate }}
+                    <div ui-content-for="navbutton-action">
+                        <a class='btn' ng-click='onCalculate()'>Calculate</a>
+                    </div>
+                </form>
             </div>
         </div>
+
+        <div ng-show="results != null" class="list-group">
+            <!-- TODO tap trade to calculate route? -->
+            <div ng-hide="results.length" class="list-group-item">No trades found</div>
+            <div ng-repeat="trade in results" class="list-group-item">
+                <div class="commodity">
+                    Buy ({{ trade.Qty }}) {{ trade.CommodityName }} @ {{ trade.Buy }}
+                </div>
+                <div class="destination">
+                    Sell at: <span class="station">{{ trade.DestinationStationName }}</span>
+                    in <span class="system">{{ trade.DestinationSystemName }}</span>
+                    (Distance: {{ trade.Distance }})
+                    <div class="profit">
+                        For total profit: {{ trade.Total }}
+                    </div>
+                    <div class="update">
+                        Last Updated: {{ trade.SellLastUpdate }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
