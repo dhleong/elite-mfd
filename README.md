@@ -4,7 +4,9 @@ Fancy, contextual Elite: Dangerous tools
 
 ## Installation
 
-For now, clone the repo somewhere
+For now, clone the repo somewhere, then install the UI stuff using
+
+    cd resources/public && bower install
 
 ## Usage
 
