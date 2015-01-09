@@ -59,6 +59,16 @@
     (java.io.StringReader. in)))
 
 (deftest test-system-poller-loop
+  (testing "Absolutely nothing"
+    (let [last-system (ref nil)
+          [file stream] (system-poller-loop 
+                          nil nil  ; no last-file/stream yet
+                          :pick-log #(identity nil)
+                          :open-log #(is (nil? %)) ; should not be called
+                          :callback #(dosync (ref-set last-system %)))]
+      (is (nil? file))
+      (is (nil? stream))
+      (is (nil? @last-system))))
   (testing "First run"
     (let [last-system (ref nil)
           [file stream] (system-poller-loop 
