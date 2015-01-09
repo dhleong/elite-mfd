@@ -5,6 +5,7 @@ angular.module('emfd', [
     'ngRoute'
   , 'emfd.views.home'
   , 'emfd.views.trading'
+  , 'emfd.views.trading.search'
 ])
 
 .config(['$routeProvider', function($routeProvider) {

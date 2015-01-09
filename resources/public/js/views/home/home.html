@@ -2,10 +2,10 @@
     <div class="error" ng-hide="info">Current System Unavailable</div>
     <div class="system" ng-show="info">Welcome to {{ info.system }}</div>
 
-    <!-- TODO ? -->
-    <!-- <ul class="nav" ng&#45;if="info"> -->
-    <!--     <a href="#/trading">Trade Calculator</a> -->
-    <!-- </ul> -->
+    <ul class="nav" ng-if="info">
+        <a href="#/search/{{ info.system }}" ng-show="info">Search near {{ info.system }}</a>
+        <!-- <a href="#/search" ng&#45;hide="info">Search</a> -->
+    </ul>
 
     <div ng-if="info" class="stations">
         <div ng-repeat="station in info.stations"

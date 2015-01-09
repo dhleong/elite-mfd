@@ -1,0 +1,44 @@
+<a href="#/home" class="nav">Home</a>
+
+<div>
+    <div class="title">
+        Search near {{ system }}
+    </div>
+
+    <form class="simple-form" ng-submit="onSearch()">
+        <table>
+
+            <tr>
+                <td>Your Ship Size</td>
+                <td>
+                    <select ng-model="form['pad-size']" ng-options="size for size in validSizes">
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td>Search Range</td>
+                <td>
+                    <select ng-model="form['search-range']" ng-options="range for range in validRanges">
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <input type="submit" class="text" value="Calculate" name="">
+    </form>
+
+    <div ng-show="results != null" class="results">
+        <!-- TODO tap trade to calculate route? -->
+        <div ng-hide="results.length">Nothing found</div>
+        <div ng-repeat="r in results">
+            <div class="location">
+                {{ r.SystemName }} ({{ r.Station.Name }})
+            </div>
+
+            <div class="price" ng-if="form['commodity']">
+                {{ form['search-type'] == 'selling' ? r.Sell : r.Buy }}
+            </div>
+        </div>
+    </div>
+</div>
+
