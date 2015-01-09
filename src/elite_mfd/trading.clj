@@ -13,7 +13,9 @@
   "http://www.elitetradingtool.co.uk/api/EliteTradingTool/Calculator")
 (def search-url 
   "http://www.elitetradingtool.co.uk/api/EliteTradingTool/Search")
-
+;; mapping for search-stations :search-type arg value to API value
+(def search-types {:buying "Station Buying"
+                   :selling "Station Selling"})
 ;;
 ;; Util methods
 ;;
@@ -30,6 +32,19 @@
             (.contains station-name input)
             (.contains system-name input))))
       (get-stations))))
+
+(defn- exists? 
+  "Conveniently get a true/false value if an arg exists"
+  [arg]
+  (or (= true arg)
+      (not (nil? arg))))
+
+(defn- arg-value 
+  "Provide a safe default value if none is provided"
+  [arg]
+  (if (nil? arg)
+    "1"
+    arg))
 
 ;;
 ;; API calls
@@ -73,25 +88,36 @@
 (defn search-stations
   "Call the station searcher with various filters"
   [system-name &
-   {:keys [callback commodity-id pad-size search-type search-range]
+   {:keys [callback
+           allegiance-id commodity-id economy-id government-id
+           has-blackmarket has-outfitting has-repairs has-shipyard
+           pad-size search-type search-range]
     :or {callback identity
-         commodity-id nil
-         pad-size "Small"
-         search-type "Station Selling" ; or "Station Buying"; req for commodity-id
+         pad-size :Small
+         search-type :selling ; req for commodity-id
          search-range "15"}}]
-  (let [request-body {:CurrentLocation system-name
-                      :Commodity (if commodity-id true false)
-                      :CommodityId commodity-id
+  (let [request-body {:Allegiance (exists? allegiance-id)
+                      :AllegianceId (arg-value allegiance-id)
+                      :Blackmarket (exists? has-blackmarket)
+                      :Commodity (exists? commodity-id)
+                      :CommodityId (arg-value commodity-id)
+                      :CurrentLocation system-name
+                      :Economy (exists? economy-id)
+                      :EconomyId (arg-value economy-id)
+                      :Government (exists? government-id)
+                      :GovernmentId (arg-value government-id)
+                      :Outfitting (exists? has-outfitting)
                       :PadSize pad-size
-                      :SearchType search-type
-                      :SearchRange search-range}]
+                      :Repairs (exists? has-repairs)
+                      :SearchRange search-range
+                      :SearchType (get search-types search-type)
+                      :Shipyard (exists? has-shipyard)}]
     (println request-body)
     (http/post 
       search-url
       {:headers {"Content-Type" "application/json"}
-       :body request-body}
+       :body (generate-string request-body)}
       (fn [{:keys [error body]}]
-        (println body)
         (if error
           (do 
             (log "! Error searching" error "Request:" request-body)
@@ -123,13 +149,13 @@
 (defn on-search
   "Packet handler for :search"
   [ch packet]
-  ; TODO implement
   (if-let [system (:system packet)]
-    ; NB this seems overly complicated
+    ; NB this also seems overly complicated
     (apply search-stations
            (flatten (conj [system] 
                           (calculate-packet-to-seq packet)
-                          :callback #(to-client ch %))))
+                          :callback #(to-client ch {:type :search-result
+                                                    :result %}))))
     (client-error ch "Must specify system")))
 
 ;;
