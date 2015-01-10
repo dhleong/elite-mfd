@@ -1,8 +1,9 @@
 'use strict';
 /* jshint indent:false */
-/* global angular */
+/* global angular, _ */
 
 var COMMODITIES = [    
+    {id:"51", name:"Advanced Catalysers"},
     {id:"45", name:"Agri-Medicines"},
     {id:"16", name:"Algae"},
     {id:"24", name:"Aluminium"},
@@ -84,6 +85,44 @@ var COMMODITIES = [
     {id:"77", name:"Wine"}
 ];
 
+var ALLEGIANCES = [
+    {id:"1", name:"Alliance"},
+    {id:"2", name:"Empire"},
+    {id:"3", name:"Federation"},
+    {id:"4", name:"Independent"},
+    {id:"5", name:"None"}
+];
+
+var GOVERNMENTS = [
+    {id:"1", name:"Anarchy"},
+    {id:"2", name:"Colony"},
+    {id:"3", name:"Communism"},
+    {id:"11", name:"Confederacy"},
+    {id:"13", name:"Cooperative"},
+    {id:"4", name:"Corporate"},
+    {id:"5", name:"Democracy"},
+    {id:"8", name:"Dictatorship"},
+    {id:"7", name:"Feudal"},
+    {id:"10", name:"Imperial"},
+    {id:"6", name:"None"},
+    {id:"12", name:"Patronage"},
+    {id:"14", name:"Prison Colony"},
+    {id:"9", name:"Theocracy"}
+];
+
+var ECONOMIES = [
+    {id:"1", name:"Agricultural"},
+    {id:"2", name:"Extraction"},
+    {id:"3", name:"High Tech"},
+    {id:"4", name:"Industrial"},
+    {id:"10", name:"Millitary"},
+    {id:"7", name:"None"},
+    {id:"5", name:"Refinery"},
+    {id:"6", name:"Service"},
+    {id:"9", name:"Terraforming"},
+    {id:"8", name:"Tourism"}
+];
+
 angular.module('emfd.views.trading.search', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
@@ -102,7 +141,6 @@ angular.module('emfd.views.trading.search', ['ngRoute'])
     $scope.form = {
         type: 'search'
       , system: $scope.system
-        // TODO etc.
       , 'search-type': 'selling'
       , 'pad-size': 'Small'
       , 'search-range': '15'
@@ -111,6 +149,9 @@ angular.module('emfd.views.trading.search', ['ngRoute'])
     $scope.validSizes = ['Small', 'Medium', 'Large'];
     $scope.validRanges = ['15', '25', '50'];
     $scope.validCommodities = COMMODITIES;
+    $scope.validAllegiances = ALLEGIANCES;
+    $scope.validGovernments = GOVERNMENTS;
+    $scope.validEconomies = ECONOMIES;
     $scope.filtersDescription = noFiltersDescription;
 
     // NB: we have to store this in an object for it to
@@ -119,21 +160,47 @@ angular.module('emfd.views.trading.search', ['ngRoute'])
     //  See: http://stackoverflow.com/questions/18716113
     $scope.data = {
         selectedCommodity: null,
+        selectedAllegiance: null,
+        selectedGovernment: null,
+        selectedEconomy: null
     }
 
     var updateFilterDesc = function(data) {
-        var desc = '';
+        var desc = [];
         if (data.selectedCommodity) {
-            desc += 'Station ' + $scope.form['search-type'] 
-                    + ' ' + data.selectedCommodity.name;
+            desc.push($scope.form['search-type'] 
+                + ' ' + data.selectedCommodity.name);
         }
 
-        $scope.filtersDescription = desc || noFiltersDescription;
+        var services = _.filter(['blackmarket', 'repairs', 'outfitting', 'shipyard'],
+                function(type) {
+            return $scope.form['has-' + type];
+        });
+
+        if (services.length) {
+            desc.push('with ' + services.join(', '));
+        }
+
+        if (data.selectedAllegiance) {
+            desc.push('allied with ' + data.selectedAllegiance.name);
+        }
+
+        if (data.selectedGovernment) {
+            desc.push('run by ' + data.selectedGovernment.name);
+        }
+
+        if (data.selectedEconomy) {
+            desc.push('that is ' + data.selectedEconomy.name);
+        }
+
+        $scope.filtersDescription = desc.length
+            ? 'Station: ' + desc.join('\n')
+            : noFiltersDescription;
     };
     $scope.$watchCollection('data', updateFilterDesc);
 
-    // watch search-type to trigger updates as well
-    $scope.$watch('form["search-type"]', function() {
+    // some filters alter the form directly
+    $scope.$watchCollection('form', function() {
         updateFilterDesc($scope.data);
     });
 
@@ -146,10 +213,17 @@ angular.module('emfd.views.trading.search', ['ngRoute'])
         }
     });
 
+    var setFormIdFromData = function(formField, dataField) {
+        $scope.form[formField] = $scope.data[dataField] 
+            ? $scope.data[dataField].id
+            : null; // clear it
+    }
     $scope.onSearch = function() {
-        if ($scope.data.selectedCommodity) {
-            $scope.form['commodity-id'] = $scope.data.selectedCommodity.id;
-        }
+        setFormIdFromData('commodity-id', 'selectedCommodity');
+        setFormIdFromData('allegiance-id', 'selectedAllegiance');
+        setFormIdFromData('government-id', 'selectedGovernment');
+        setFormIdFromData('economy-id', 'selectedEconomy');
+
         console.log($scope.form);
         $scope.results = null;
         websocket.send($scope.form);

@@ -17,7 +17,7 @@
         <div class="form-group">
             <label>Commodity</label>
             <select ng-model="data.selectedCommodity" ng-options="comm.name for comm in validCommodities" class="form-control">
-                <option value="">-- Select Commodity --</option>
+                <option value="">-- Any Commodities --</option>
             </select>
         </div>
 
@@ -35,11 +35,45 @@
 
     <div ui-if="activeTab == 2">
         <!-- Services selection -->
-        <p>{{lorem}}</p>
+        <div class="form-group">
+            <label>Blackmarket</label>
+            <ui-switch ng-model="form['has-blackmarket']"></ui-switch>
+        </div>
+        <div class="form-group">
+            <label>Outfitting</label>
+            <ui-switch ng-model="form['has-outfitting']"></ui-switch>
+        </div>
+        <div class="form-group">
+            <label>Shipyard</label>
+            <ui-switch ng-model="form['has-shipyard']"></ui-switch>
+        </div>
+        <div class="form-group">
+            <label>Repairs</label>
+            <ui-switch ng-model="form['has-repairs']"></ui-switch>
+        </div>
     </div>
 
     <div ui-if="activeTab == 3">
         <!-- Environment selection -->
-        <p>{{lorem}}</p>
+        <div class="form-group">
+            <label>Allegiance</label>
+            <select ng-model="data.selectedAllegiance" ng-options="a.name for a in validAllegiances" class="form-control">
+                <option value="">-- Any Allegiance --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Government</label>
+            <select ng-model="data.selectedGovernment" ng-options="a.name for a in validGovernments" class="form-control">
+                <option value="">-- Any Government --</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Economy</label>
+            <select ng-model="data.selectedEconomy" ng-options="a.name for a in validEconomies" class="form-control">
+                <option value="">-- Any Economy --</option>
+            </select>
+        </div>
     </div>
 </div>

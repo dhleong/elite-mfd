@@ -8,6 +8,18 @@ div.station {
     cursor: pointer;
 }
 
+.filters {
+    white-space: pre-line;
+}
+
+.modal-body {
+    padding: 1em;
+}
+.modal .section {
+    padding-left: 0;
+    padding-right: 0;
+}
+
 .hidden {
     display: none;
 }
