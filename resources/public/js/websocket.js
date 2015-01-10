@@ -5,6 +5,7 @@
  * Constants
  */
 var WEBSOCKET_PORT = 9877;
+var MAX_DELAY = 7000;
 function Dummy() {}
 
 /*
@@ -21,10 +22,19 @@ var websocketSettings = {
 function websocket(url, s) {
     var ws = WebSocket ? new WebSocket( url ) : {
         send: function(/*m*/){ return false },
-        close: function(){}
+        close: function() {
+        }
     };
 
     ws._settings = _.extend(websocketSettings, s);
+    ws.onopen = function() {
+        if (ws._settings.open)
+            ws._settings.open.call(this);
+    };
+    ws.onclose = function() {
+        if (ws._settings.close)
+            ws._settings.close.call(this);
+    };
     ws.onmessage = function(e){
         var m = JSON.parse(e.data);
         // make pretty clojure keywords into
@@ -57,7 +67,7 @@ function websocket(url, s) {
     /** 'open' or 'close' */
     ws.registerStatus = function(eventName, handler) {
         // I guess
-        ws['on' + eventName] = handler;
+        ws._settings[eventName] = handler;
     };
 
     /** Attach a global packet handler */
@@ -72,12 +82,13 @@ function websocket(url, s) {
      *  updates to bound variables will be reflected as expected
      */
     ws.registerLocal = function($scope, events) {
-        ws._settings.$scope = $scope;
-        ws._settings.current_events = events;
+        var settings = ws._settings;
+        settings.$scope = $scope;
+        settings.current_events = events;
         $scope.$on('$destroy', function() {
-            if (ws._settings.$scope === $scope) {
-                ws._settings.$scope = null;
-                ws._settings.current_events = {};
+            if (settings.$scope === $scope) {
+                settings.$scope = null;
+                settings.current_events = {};
             }
         });
     };
@@ -101,12 +112,42 @@ angular.module('emfd')
         open: function() {
             console.log("Connected");
         }
-      , close: function() {
-            console.log("Disconnected");
-        }
     });
 
+    // hax for auto-reconnect
     var self = this;
+    var originalOnClose = this.socket.onclose;
+    var originalSettings = this.socket._settings;
+    this.socket.onclose = function() {
+        // call through
+        originalOnClose.call(self.socket);
+
+        console.log("Lost connection!");
+        var delay = 500;
+        var reconnector = function() {
+            console.log("Reconnecting...");
+
+            websocket(url, {
+                open: function() {
+                    console.log("Reconnected!", this);
+                    // forward send() from the old instance
+                    //  to the new instance
+                    self.socket.send = _.bind(this.send, this);
+                    self.socket = this;
+                    self._settings = originalSettings;
+                },
+                close: function() {
+                    delay = Math.min(MAX_DELAY, delay * 2);
+                    console.log("Failed, retrying after", delay);
+                    setTimeout(reconnector, delay);
+                }
+            });
+        }
+
+        // go!
+        reconnector();
+    }
+
     this.$get = function() {
         return self.socket;
     };

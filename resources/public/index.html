@@ -13,29 +13,35 @@
     </head>
     <body>
         <div class="app">
-            <div class="navbar navbar-app navbar-absolute-top">
+            <div class="navbar navbar-app navbar-absolute-top" ng-class="{'disabled': !connected}">
                 <div class="navbar-brand navbar-brand-center" ui-yield-to="title">
                     Elite MFD
                 </div>
 
-                <div class="btn-group pull-left">
+                <div class="btn-group pull-left" ng-class="{'hidden': !connected}">
                     <div class="btn btn-navbar" ui-yield-to="navbutton-left"></div>
                 </div>
 
-                <div class="btn-group pull-right">
+                <div class="btn-group pull-right" ng-class="{'hidden': !connected}">
                     <div class="btn btn-navbar" ui-yield-to="navbutton-action"></div>
                 </div>
             </div>
 
             <div class="navbar navbar-app navbar-absolute-bottom">
-                <div class="btn-group justified" ui-yield-to="bottom-nav">
+                <div class="btn-group justified" ui-yield-to="bottom-nav" ng-class="{'hidden': !connected}">
                     <a href="#/home" class="btn btn-navbar">Home</a>
                 </div>
             </div>
 
-            <div class="app-body">
+            <div class="app-body" ng-controller="CoreController">
                 <div class="app-content">
-                    <div ng-view></div>
+                    <div ng-view ng-show="connected"></div>
+                    <div class="section" ng-hide="connected">
+                        <div class="app-content-loading">
+                            <h3 ng-if="everConnected" class="pull-left">Reconnecting...</h3>
+                            <i class="fa fa-spinner fa-spin loading-spinner"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

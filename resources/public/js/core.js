@@ -1,61 +1,30 @@
 'use strict';
-/* global angular, _ */
+/* global angular */
 
 angular.module('emfd')
 
-.provider('currentSystem', ['websocketProvider', function(wsProvider) {
-    // NB not sure why we can't just request 'websocket'...
-    var $websocket = wsProvider.$get();
+.controller('CoreController', ['$rootScope', 'websocket',
+        function($rootScope, websocket) {
 
-    this._watchers = [];
+    $rootScope.connected = false;
+    $rootScope.everConnected = false;
 
-    var self = this;
-    var instance = {
-        systemName: function() {
-            return self._lastPacket && self._lastPacket.system;
-        },
-        get: function() {
-            return self._lastPacket;
-        }
-    };
-
-    var $trigger = function(parts) {
-        var $scope = parts[0];
-        var getter = parts[1];
-        var varName = parts[2];
-        $scope.$apply(function() {
-            $scope[varName] = instance[getter]();
+    websocket.registerStatus('close', function() {
+        $rootScope.$apply(function() {
+            $rootScope.connected = false;
         });
-    };
-
-    $websocket.registerGlobal('on_system', function(packet) {
-        console.log('currentSystem updated:', packet);
-        self._lastPacket = packet;
-        _.each(self._watchers, $trigger);
     });
 
-    /**
-     * Probably the best public interface?
-     * @param getterName (optional) if not provided, returns
-     *  the whole packet
-     */
-    instance.watch = function($scope, getterName, varName) {
-        if (!varName) {
-            varName = getterName;
-            getterName = 'get';
-        }
+    websocket.registerGlobal('on_system', function(packet) {
+        console.log("<<", packet);
+        $rootScope.$apply(function() {
+            // we set connected when we get the first
+            //  on_system packet for better UX
+            $rootScope.connected = true;
+            $rootScope.everConnected = true;
 
-        var args = [$scope, getterName, varName];
-        self._watchers.push(args);
-        $scope[varName] = instance[getterName]();
-        $scope.$on('$destroy', function() {
-            self._watchers = _.filter(self._watchers, function(el) {
-                return el !== args;
-            });
+            $rootScope.currentSystem = packet;
         });
-    };
+    });
 
-    this.$get = function() {
-        return instance;
-    }
 }]);

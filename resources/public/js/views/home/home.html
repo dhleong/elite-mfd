@@ -1,25 +1,25 @@
-<div ui-content-for="bottom-nav" ng-if="info">
+<div ui-content-for="bottom-nav" ng-if="currentSystem">
     <div class="btn-group justified" >
-        <a href="#/search/{{ info.system }}" class="btn btn-navbar">Search</a>
+        <a href="#/search/{{ currentSystem.system }}" class="btn btn-navbar">Search</a>
     </div>
 </div>
 
 <div class="scrollable">
     <div class="scrollable-content">
 
-        <div class="list-group" ng-if="info">
+        <div class="list-group" ng-if="currentSystem">
 
             <div class="list-group-item text-center">
                 <div>
-                    <h3 class="home-heading error" ng-hide="info">Current System Unavailable</span>
-                    <h3 class="home-heading" ng-show="info">Welcome to {{ info.system }}</span>
+                    <h3 class="home-heading error" ng-hide="currentSystem">Current System Unavailable</span>
+                    <h3 class="home-heading" ng-show="currentSystem">Welcome to {{ currentSystem.system }}</span>
                 </div>
 
                 <div>
                     <h4 class="home-heading">Nearby Stations:</h4>
                 </div>
             </div>
-            <a ng-repeat="station in info.stations"
+            <a ng-repeat="station in currentSystem.stations"
                    class="list-group-item"
                    href="#/trading/{{ station }}">
                {{ station }} <i class="fa fa-chevron-right pull-right"></i>
