@@ -110,7 +110,7 @@
                       :PadSize pad-size
                       :Repairs (exists? has-repairs)
                       :SearchRange search-range
-                      :SearchType (get search-types search-type)
+                      :SearchType (get search-types (keyword search-type))
                       :Shipyard (exists? has-shipyard)}]
     (println request-body)
     (http/post 

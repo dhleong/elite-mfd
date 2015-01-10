@@ -20,8 +20,12 @@
 ;
 ; Config
 ;
-; FIXME actual path
-(def product-root (file (System/getProperty "user.home") "Desktop"))
+(def app-data (file (System/getProperty "user.home") "AppData"))
+(def product-root (if (.exists app-data) 
+                    ; actual windows machine
+                    (file app-data "Local/Frontier_Developments/Products")
+                    ; dev environment
+                    (file (System/getProperty "user.home") "Desktop")))
 (def http-port 9876)
 (def websockets-port 9877)
 (def nrepl-port 7888)
@@ -137,6 +141,9 @@
                   wrap-dir-index)
               {:port http-port})
   (log "Http listening on " http-port)
+  (if (.exists product-dir)
+    (log "Found product dir" product-dir)
+    (log "Expected product dir" product-dir "does not exists"))
   (let [server (create-server websockets-port)
         system-callback #(set-system server %)
         system-poll-future (future (system-poller system-callback))]

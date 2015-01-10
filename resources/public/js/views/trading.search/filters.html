@@ -1,0 +1,45 @@
+<div class='section'>
+    <ui-state id='activeTab' default='1'></ui-state>
+
+    <div class="btn-group justified nav-tabs">
+        <a ui-set="{'activeTab': 1}" 
+            ui-class="{'active': activeTab == 1}" class="btn btn-default">Commodities</a>
+
+        <a ui-set="{'activeTab': 2}" 
+                ui-class="{'active': activeTab == 2}" class="btn btn-default">Services</a>
+
+        <a ui-set="{'activeTab': 3}" 
+                ui-class="{'active': activeTab == 3}" class="btn btn-default">Environment</a>
+    </div>  
+
+    <div ui-if="activeTab == 1">
+        <!-- Commodity search -->
+        <div class="form-group">
+            <label>Commodity</label>
+            <select ng-model="data.selectedCommodity" ng-options="comm.name for comm in validCommodities" class="form-control">
+                <option value="">-- Select Commodity --</option>
+            </select>
+        </div>
+
+        <div ng-show="data.selectedCommodity" class="form-group">
+            <label>Station is:</label>
+            <div class="btn-group">
+                <a href class="btn btn-default" ui-turn-on='buying' ui-state='buying' ng-class="{'active': form['search-type'] == 'buying'}" ui-exclusion-group='searchType' ng-click="form['search-type'] = 'buying'">Buying</a>
+                <a href class="btn btn-default" ui-turn-on='searchSelling' ui-state='searchSelling' ng-class="{'active': form['search-type'] == 'selling'}" ui-exclusion-group='searchType' ng-click="form['search-type'] = 'selling'">Selling</a>
+            </div>
+
+            <!-- convenience to clear -->
+            <a href="" ng-click="data.selectedCommodity=null" class='btn'>&times; Clear</a>
+        </div>
+    </div>
+
+    <div ui-if="activeTab == 2">
+        <!-- Services selection -->
+        <p>{{lorem}}</p>
+    </div>
+
+    <div ui-if="activeTab == 3">
+        <!-- Environment selection -->
+        <p>{{lorem}}</p>
+    </div>
+</div>
