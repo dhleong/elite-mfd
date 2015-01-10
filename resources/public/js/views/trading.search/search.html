@@ -14,7 +14,7 @@
                 <form role="form" class="form-horizontal" ng-submit="onSearch()">
                     <div class="form-group">
                         <label class="col-sm-12 control-label list-group-item">Filters</label>
-                        <a class="col-sm-12 list-group-item filters" href="" ui-turn-on="modal1"><span ng-bind-html="filtersDescription"></span><i class="fa fa-chevron-right pull-right"></i></a>
+                        <a class="col-sm-12 list-group-item filters" href="" ui-turn-on="modalFilter"><span ng-bind-html="filtersDescription"></span><i class="fa fa-chevron-right pull-right"></i></a>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-3 control-label">Ship Size</label>
@@ -74,12 +74,13 @@
 </div>
 
 <div ui-content-for="modals">
-    <div class="modal modal-overlay" ui-if='modal1' ui-state='modal1'>
+    <div class="modal modal-overlay" ui-if='modalFilter' ui-state='modalFilter'>
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button class="close" 
-                            ui-turn-off="modal1">&times;</button>
+                            ui-turn-off="modalFilter"
+                            ng-click="onFilterClosed()">&times;</button>
                     <h4 class="modal-title">Filters</h4>
                 </div>
                 <div class="modal-body">
@@ -87,7 +88,7 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-default" ng-click="resetFilters()">Reset</button>
-                    <button ui-turn-off="modal1" class="btn btn-primary">Save changes</button>
+                    <button ui-turn-off="modalFilter" class="btn btn-primary" ng-click="onFilterClosed()">Save changes</button>
                 </div>
             </div>
         </div>

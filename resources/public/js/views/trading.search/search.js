@@ -199,7 +199,6 @@ angular.module('emfd.views.trading.search', ['ngRoute'])
         $scope.filtersDescription = desc.length
             ? $sce.trustAsHtml('Station: ' + desc.join('\n    '))
             : noFiltersDescription;
-
     };
     $scope.$watchCollection('data', updateFilterDesc);
 
@@ -228,10 +227,17 @@ angular.module('emfd.views.trading.search', ['ngRoute'])
         setFormIdFromData('government-id', 'selectedGovernment');
         setFormIdFromData('economy-id', 'selectedEconomy');
 
-        console.log($scope.form);
+        console.log("Search >>", $scope.form);
         $scope.results = null;
         websocket.send($scope.form);
     };
+
+    $scope.onFilterClosed = function() {
+        // if we already have results, re-search with changed filters
+        if (null !== $scope.results) {
+            $scope.onSearch();
+        }
+    }
 
     $scope.resetFilters = function() {
         $scope.data = {};
@@ -240,5 +246,8 @@ angular.module('emfd.views.trading.search', ['ngRoute'])
         function(field) {
             $scope.form[field] = null;
         });
+
+        // clear results
+        $scope.results = null;
     }
 }]);

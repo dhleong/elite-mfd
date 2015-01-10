@@ -32,6 +32,10 @@
     padding-right: 0;
 }
 
+.list-group-item.row {
+    margin-right: 0;
+}
+
 .hidden {
     display: none;
 }
