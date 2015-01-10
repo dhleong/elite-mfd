@@ -41,13 +41,31 @@
         <div ng-show="results != null" class="list-group">
             <!-- TODO tap trade to calculate route? -->
             <div ng-hide="results.length" class="list-group-item">Nothing found</div>
-            <div ng-repeat="r in results" class="list-group-item">
-                <div class="location">
-                    {{ r.SystemName }} ({{ r.Station.Name }})
-                </div>
+            <div ng-repeat="r in results" class="list-group-item row">
+                <div class="col-xs-7">
+                    <div class="location">
+                        {{ r.SystemName }} ({{ r.Station.Name }})
+                    </div>
 
-                <div class="price" ng-if="form['commodity']">
-                    {{ form['search-type'] == 'selling' ? r.Sell : r.Buy }}
+                    <div class="small">
+                        {{ r.System.Allegiance.Name }} {{ r.System.Government.Name }} {{ r.Station.Economy.Name }}
+                    </div>
+                    
+                    <div class="small">
+                        Has {{ r.Station.Services }}
+                    </div>
+                </div>
+                <div class="col-xs-5 text-right">
+                    <div>{{ r.Distance }} Ly</div>
+                    <div class="price" ng-if="form['commodity-id']">
+                        <!-- this looks weird, but it's true -->
+                        <div ng-if="form['search-type'] == 'selling'">
+                            Sells <i>{{ data.selectedCommodity.name }}</i> at <b>{{ r.Buy }}</b>
+                        </div>
+                        <div ng-if="form['search-type'] == 'buying'">
+                            Buys <i>{{ data.selectedCommodity.name }}</i> at <b>{{ r.Sell }}</b>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
