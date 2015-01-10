@@ -19,6 +19,9 @@
                     <h4 class="home-heading">Nearby Stations:</h4>
                 </div>
             </div>
+            <div class="list-group-item text-center" ng-if="!currentSystem.stations">
+                None
+            </div>
             <a ng-repeat="station in currentSystem.stations"
                    class="list-group-item"
                    href="#/trading/{{ station }}">
