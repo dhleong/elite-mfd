@@ -133,10 +133,10 @@ angular.module('emfd.views.trading.search', ['ngRoute'])
 }])
 
 .controller('SearchController', [
-        '$scope', '$routeParams', 'websocket',
-        function($scope, $routeParams, websocket) {
+        '$scope', '$routeParams', '$sce', 'websocket',
+        function($scope, $routeParams, $sce, websocket) {
 
-    var noFiltersDescription = "(Edit Filters)";
+    var noFiltersDescription = $sce.trustAsHtml("(Edit Filters)");
     $scope.system = $routeParams.system;
     $scope.form = {
         type: 'search'
@@ -147,7 +147,7 @@ angular.module('emfd.views.trading.search', ['ngRoute'])
     };
 
     $scope.validSizes = ['Small', 'Medium', 'Large'];
-    $scope.validRanges = ['15', '25', '50'];
+    $scope.validRanges = ['15', '25', '50', '100', '150'];
     $scope.validCommodities = COMMODITIES;
     $scope.validAllegiances = ALLEGIANCES;
     $scope.validGovernments = GOVERNMENTS;
@@ -166,10 +166,13 @@ angular.module('emfd.views.trading.search', ['ngRoute'])
     }
 
     var updateFilterDesc = function(data) {
+        var emphasize = function(str) { return '<i>' + str + '</i>' };
+
+        // NB binding HTML here is a bit lame, but it looks nicer
         var desc = [];
         if (data.selectedCommodity) {
-            desc.push($scope.form['search-type'] 
-                + ' ' + data.selectedCommodity.name);
+            desc.push('<u>' + $scope.form['search-type'] + '</u>'
+                + ' ' + emphasize(data.selectedCommodity.name));
         }
 
         var services = _.filter(['blackmarket', 'repairs', 'outfitting', 'shipyard'],
@@ -178,24 +181,25 @@ angular.module('emfd.views.trading.search', ['ngRoute'])
         });
 
         if (services.length) {
-            desc.push('with ' + services.join(', '));
+            desc.push('with ' + emphasize(services.join(', ')));
         }
 
         if (data.selectedAllegiance) {
-            desc.push('allied with ' + data.selectedAllegiance.name);
+            desc.push('allied with ' + emphasize(data.selectedAllegiance.name));
         }
 
         if (data.selectedGovernment) {
-            desc.push('run by ' + data.selectedGovernment.name);
+            desc.push('run by ' + emphasize(data.selectedGovernment.name));
         }
 
         if (data.selectedEconomy) {
-            desc.push('that is ' + data.selectedEconomy.name);
+            desc.push('that is ' + emphasize(data.selectedEconomy.name));
         }
 
         $scope.filtersDescription = desc.length
-            ? 'Station: ' + desc.join('\n')
+            ? $sce.trustAsHtml('Station: ' + desc.join('\n    '))
             : noFiltersDescription;
+
     };
     $scope.$watchCollection('data', updateFilterDesc);
 
@@ -228,4 +232,13 @@ angular.module('emfd.views.trading.search', ['ngRoute'])
         $scope.results = null;
         websocket.send($scope.form);
     };
+
+    $scope.resetFilters = function() {
+        $scope.data = {};
+        _.each(['commodity-id', 'allegiance-id', 'government-id', 'economy-id',
+                'has-blackmarket', 'has-repairs', 'has-outfitting', 'has-shipyard'],
+        function(field) {
+            $scope.form[field] = null;
+        });
+    }
 }]);

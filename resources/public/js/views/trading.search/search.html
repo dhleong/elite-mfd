@@ -10,14 +10,11 @@
     <div class="scrollable-content">
 
         <div class="list-group">
-
             <div class="list-group-item">
                 <form role="form" class="form-horizontal" ng-submit="onSearch()">
                     <div class="form-group">
-                        <label class="col-sm-12 control-label">Filters</label>
-                        <a class="col-sm-12 list-group-item filters" href="" ui-turn-on="modal1">
-                            {{ filtersDescription }} <i class="fa fa-chevron-right pull-right"></i>
-                        </a>
+                        <label class="col-sm-12 control-label list-group-item">Filters</label>
+                        <a class="col-sm-12 list-group-item filters" href="" ui-turn-on="modal1"><span ng-bind-html="filtersDescription"></span><i class="fa fa-chevron-right pull-right"></i></a>
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">Ship Size</label>
@@ -58,7 +55,6 @@
 </div>
 
 <div ui-content-for="modals">
-    <ui-state id='modal1' default='1'></ui-state>
     <div class="modal modal-overlay" ui-if='modal1' ui-state='modal1'>
         <div class="modal-dialog">
             <div class="modal-content">
@@ -71,7 +67,7 @@
                     <div ng-include="'js/views/trading.search/filters.html'"></div>
                 </div>
                 <div class="modal-footer">
-                    <!-- <button ui&#45;turn&#45;off="modal1" class="btn btn&#45;default">Close</button> -->
+                    <button class="btn btn-default" ng-click="resetFilters()">Reset</button>
                     <button ui-turn-off="modal1" class="btn btn-primary">Save changes</button>
                 </div>
             </div>
