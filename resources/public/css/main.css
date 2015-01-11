@@ -37,9 +37,16 @@
     height: 100%;
 }
 
-/* .list-group-item.row { */
-/*     margin-right: 0; */
-/* } */
+.list-group-item.row {
+    /* 
+     * default margin-right: -15 causes the
+     * viewport to scroll horizonally;
+     * we can fake the look by getting rid of
+     * both the padding-right and margin-right
+     */
+    margin-right: 0;
+    padding-right: 0;
+}
 
 .hidden {
     display: none;
