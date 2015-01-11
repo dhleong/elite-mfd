@@ -50,10 +50,14 @@ function websocket(url, s) {
             });
             e.preventDefault();
         } 
-        h = self._settings.global_events[t];
-        if (h) {
-            h.call(self, m);
+        var gh = self._settings.global_events[t];
+        if (gh) {
+            gh.call(self, m);
             e.preventDefault();
+        }
+
+        if (!(h || gh)) {
+            console.log("! Unhandled:", m);
         }
     };
 

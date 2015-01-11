@@ -123,7 +123,7 @@ var ECONOMIES = [
     {id:"8", name:"Tourism"}
 ];
 
-angular.module('emfd.views.trading.search', ['ngRoute'])
+angular.module('emfd.views.trading.search', ['ngRoute', 'emfd'])
 
 .config(['$routeProvider', function($routeProvider) {
     $routeProvider.when('/search/:system', {

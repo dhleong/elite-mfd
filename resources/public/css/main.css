@@ -32,6 +32,11 @@
     padding-right: 0;
 }
 
+.modal-scrollable .modal-body {
+    /** unfortunately breaks footers... */
+    height: 100%;
+}
+
 .list-group-item.row {
     margin-right: 0;
 }

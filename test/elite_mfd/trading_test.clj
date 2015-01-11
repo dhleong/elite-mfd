@@ -49,6 +49,18 @@
   \"Distance\":0.0}]}")
 
 
+;;
+;; Util methods
+;;
+(defn- filter-stations-search
+  "Returns a set containing the results
+  of (filter-stations) with the given input,
+  and extracting the given field"
+  [input & {:keys [field] :or {field :Station}}]
+  (set 
+    (map #(get % field)
+         (filter-stations input))))
+
 (defn- do-test [func test-callback]
   (let [called (ref false)
         result @(func

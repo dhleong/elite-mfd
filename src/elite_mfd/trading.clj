@@ -74,7 +74,8 @@
                       :StartStationId (station-id station-name-start)}]
     (http/post 
       calculate-url
-      {:headers {"Content-Type" "application/json"}
+      {:timeout 1000
+       :headers {"Content-Type" "application/json"}
        :body (generate-string request-body)}
       (fn [{:keys [error body]}]
         (if error
@@ -115,7 +116,8 @@
     (println request-body)
     (http/post 
       search-url
-      {:headers {"Content-Type" "application/json"}
+      {:timeout 1000
+       :headers {"Content-Type" "application/json"}
        :body (generate-string request-body)}
       (fn [{:keys [error body]}]
         (if error
@@ -158,6 +160,15 @@
                                                     :result %}))))
     (client-error ch "Must specify system")))
 
+(defn on-stations
+  "Station search handler"
+  [ch packet]
+  (if-let [q (:q packet)]
+    (to-client ch {:type :stations-result
+                   :q q ;; give back q to ignore old queries
+                   :result (take 100 (filter-stations q))})
+    (client-error ch "No query provided")))
+
 ;;
 ;; Registration
 ;;
@@ -166,4 +177,5 @@
   [handlers]
   (assoc handlers
          :calculate on-calculate
-         :search on-search))
+         :search on-search
+         :stations on-stations))

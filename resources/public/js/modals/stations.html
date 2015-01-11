@@ -1,0 +1,28 @@
+<div ui-content-for="modals">
+    <div class="modal modal-overlay modal-scrollable" ui-if='modalStation' ui-state='modalStation'>
+        <div class="modal-dialog">
+            <div class="modal-content" >
+                <div class="modal-header">
+                    <button class="close" 
+                            ui-turn-off="modalStation"
+                            ng-click="onModalStationClosed()">&times;</button>
+                    <h4 class="modal-title">Station Search</h4>
+                </div>
+                <div class="modal-body ">
+                    <div class="scrollable">
+                        <div class="scrollable-header">
+                            <input type="text" class="form-control" placeholder="Station Name" ng-model="autoStationsData.input" autofocus />
+                        </div>
+                        <div class="scrollable-content">
+                            <div class="list-group" ng-if="autoStationsData.results != null">
+                                <div ng-if="!autoStationsData.results" class="list-group-item">No Stations Found</div>
+                                <a class="list-group-item" href ng-repeat="r in autoStationsData.results" ng-click="selectResult(r)">{{ r.Station }} ({{ r.System }})</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
