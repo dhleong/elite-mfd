@@ -147,7 +147,7 @@
   (let [server (create-server websockets-port)
         system-callback #(set-system server %)
         system-poll-future (future (system-poller system-callback))]
-    @system-poll-future
+    system-poll-future
     ))
 
 ;; (-main)
