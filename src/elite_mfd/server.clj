@@ -2,9 +2,12 @@
       :doc "The websocket server"}
   elite-mfd.server
   (:require [cheshire.core :refer [generate-string parse-string]]
-            [elite-mfd.util :refer [log each-client to-client]]
-            [elite-mfd.core-api :refer [get-system-stations]]
-            [elite-mfd.trading :as trading])
+            [elite-mfd
+             [util :refer [log each-client to-client]]
+             [core-api :refer [get-system-stations]]
+             [trading :as trading]
+             [navigate :as navigate]  
+             [narrate :as narrate]])
   (:use org.httpkit.server))
 
 (defn add-client
@@ -55,7 +58,9 @@
   [port]
   (let [server (ref {:clients [] :system nil})
         handlers (-> {}
-                     trading/register-handlers)]
+                     trading/register-handlers
+                     navigate/register-handlers  
+                     narrate/register-handlers)]
     (run-server (partial client-handler server handlers) {:port port})
     (println "Websockets listening on" port)
     server))

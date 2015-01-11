@@ -7,6 +7,16 @@
     white-space: pre;
 }
 
+.current-navigation {
+    /* borrowed from bg-info */
+    background: #d9edf7;
+}
+
+.navigation-name {
+    padding: 1em;
+    font-size: 120%;
+}
+
 .app-content-loading {
   text-align: center;
   height: 100%;
@@ -22,6 +32,11 @@
   top: 50%;
   margin-left: -25px;
   margin-top: -25px;
+}
+
+.list-group-item > .loading-spinner {
+    position: relative;
+    margin-top: 0;
 }
 
 .modal-body {

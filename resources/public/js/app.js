@@ -7,6 +7,7 @@ angular.module('emfd', [
   , 'emfd.views.home'
   , 'emfd.views.trading'
   , 'emfd.views.trading.search'
+  , 'emfd.views.navigate'
 ])
 
 .config(['$routeProvider', function($routeProvider) {

@@ -30,4 +30,21 @@
             (callback nil))
           (callback (parse-string body true)))))))
 
+;;
+;; Handlers
+;;
+(defn on-navigate
+  [ch packet]
+  (apply plot-route 
+         (flatten (conj (vec packet)
+                        :callback #(to-client ch {:type :navigate-result
+                                                  :result % })))))
 
+;;
+;; Registration
+;;
+(defn register-handlers
+  "Interface used by server for registering websocket packet handlers"
+  [handlers]
+  (assoc handlers
+         :navigate on-navigate))
