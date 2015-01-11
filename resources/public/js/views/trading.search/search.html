@@ -56,7 +56,7 @@
                     </div>
                 </div>
                 <div class="col-xs-5 text-right">
-                    <div>{{ r.Distance }} Ly</div>
+                    <div>{{ r.Distance }}&nbsp;Ly <b>|</b> {{ r.Station.DistanceFromJumpIn|bigNumber:'&nbsp;' }}Ls</div>
                     <div class="price" ng-if="form['commodity-id']">
                         <!-- this looks weird, but it's true -->
                         <div ng-if="form['search-type'] == 'selling'">

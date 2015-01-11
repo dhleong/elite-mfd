@@ -71,14 +71,14 @@
                     Buy ({{ trade.Qty }}) {{ trade.CommodityName }} @ {{ trade.Buy }}
                 </div>
                 <div class="destination">
-                    Sell at: <span class="station">{{ trade.DestinationStationName }}</span>
-                    in <span class="system">{{ trade.DestinationSystemName }}</span>
-                    (Distance: {{ trade.Distance }})
+                    Sell at: <span class="station">{{ trade.DestinationStationName }}</span> ({{ trade.DistanceFromJumpIn }} Ls)<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;in <span class="system">{{ trade.DestinationSystemName }}</span>
+                    ({{ trade.Distance }}&nbsp;Ly)
                     <div class="profit">
                         For total profit: {{ trade.Total }}
                     </div>
                     <div class="update">
-                        Last Updated: {{ trade.SellLastUpdate }}
+                        Last Updated: {{ trade.LastUpdate }}
                     </div>
                 </div>
             </div>

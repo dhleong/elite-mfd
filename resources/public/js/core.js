@@ -110,4 +110,23 @@ angular.module('emfd')
             });
         }
     };
-}]);
+}])
+
+.filter('bigNumber', function() {
+    /**
+     * If you have a unit after the number, for example,
+     *  but want a space between the number an the unit,
+     *  you can use as `bigNumber:' '` and we'll put the
+     *  space before the 'M' or 'K'
+     */
+    return function(input, after) {
+        after = after || '';
+        if (input > 10e6) {
+            return Math.round(input / 1e6) + after + 'M';
+        } else if (input > 10e3) {
+            return Math.round(input / 1e3) + after + 'K';
+        } else {
+            return input + after;
+        }
+    }
+});
