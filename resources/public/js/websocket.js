@@ -18,6 +18,7 @@ var websocketSettings = {
     global_events: {},
     current_events: {},
 };
+var websocket_id = 0;
 
 function websocket(url, s) {
     var ws = WebSocket ? new WebSocket( url ) : {
@@ -25,31 +26,33 @@ function websocket(url, s) {
         close: function() {
         }
     };
+    ws.id = websocket_id++;
 
     ws._settings = _.extend(websocketSettings, s);
     ws.onopen = function() {
-        if (ws._settings.open)
-            ws._settings.open.call(this);
+        if (this._settings.open)
+            this._settings.open.call(this);
     };
     ws.onclose = function() {
-        if (ws._settings.close)
-            ws._settings.close.call(this);
+        if (this._settings.close)
+            this._settings.close.call(this);
     };
     ws.onmessage = function(e){
+        var self = this;
         var m = JSON.parse(e.data);
         // make pretty clojure keywords into
         //  pretty-ish javascript (so we don't have to quote)
         var t = m.type.replace('-', '_'); 
-        var h = ws._settings.current_events && ws._settings.current_events[t];
+        var h = self._settings.current_events && self._settings.current_events[t];
         if (h) {
-            ws._settings.$scope.$apply(function() {
-                h.call(ws, m);
+            self._settings.$scope.$apply(function() {
+                h.call(self, m);
             });
             e.preventDefault();
         } 
-        h = ws._settings.global_events[t];
+        h = self._settings.global_events[t];
         if (h) {
-            h.call(ws, m);
+            h.call(self, m);
             e.preventDefault();
         }
     };
@@ -67,12 +70,12 @@ function websocket(url, s) {
     /** 'open' or 'close' */
     ws.registerStatus = function(eventName, handler) {
         // I guess
-        ws._settings[eventName] = handler;
+        this._settings[eventName] = handler;
     };
 
     /** Attach a global packet handler */
     ws.registerGlobal = function(eventName, handler) {
-        ws._settings.global_events[eventName] = handler;
+        this._settings.global_events[eventName] = handler;
     };
 
     /**
@@ -82,7 +85,7 @@ function websocket(url, s) {
      *  updates to bound variables will be reflected as expected
      */
     ws.registerLocal = function($scope, events) {
-        var settings = ws._settings;
+        var settings = this._settings;
         settings.$scope = $scope;
         settings.current_events = events;
         $scope.$on('$destroy', function() {
@@ -98,6 +101,55 @@ function websocket(url, s) {
     return ws;
 }
 
+function makeReconnectable(provider, socket, url) {
+    // save some original values
+    socket._onclose = socket.onclose;
+    var originalSettings = socket._settings;
+
+    socket.onclose = function() {
+        // call through, bound to newest socket
+        this._onclose.call(provider.socket);
+
+        console.log("Lost connection!");
+        var delay = 500;
+        var reconnector = function() {
+            console.log("Reconnecting...", socket.id);
+
+            websocket(url, {
+                open: function() {
+                    console.log("Reconnected!", this.id);
+                    delay = 500; // reset
+
+                    // out with the old, in with the new...
+                    this._settings.open = null;
+                    this._settings.close = null;
+                    makeReconnectable(provider, this, url);
+
+                    // forward send() from the old instance
+                    //  to the new instance
+                    provider.socket.send = _.bind(this.send, this);
+                    provider.socket.close = _.bind(this.close, this);
+                    provider.socket = this;
+
+                    // copy over the old settings (since they have
+                    //  scopes and stuff) but keep our close listener
+                    //  (it was prepared by makeReconnectable)
+                    var newClose = this._settings.close;
+                    this._settings = originalSettings;
+                    this._settings.close = newClose;
+                },
+                close: function() {
+                    delay = Math.min(MAX_DELAY, delay * 2);
+                    console.log("Failed, retrying after", delay, "on", this.id);
+                    setTimeout(reconnector, delay);
+                }
+            });
+        }
+
+        // go!
+        reconnector();
+    }
+}
 
 angular.module('emfd')
 .provider('websocket', function() {
@@ -116,39 +168,18 @@ angular.module('emfd')
 
     // hax for auto-reconnect
     var self = this;
-    var originalOnClose = this.socket.onclose;
-    var originalSettings = this.socket._settings;
-    this.socket.onclose = function() {
-        // call through
-        originalOnClose.call(self.socket);
-
-        console.log("Lost connection!");
-        var delay = 500;
-        var reconnector = function() {
-            console.log("Reconnecting...");
-
-            websocket(url, {
-                open: function() {
-                    console.log("Reconnected!", this);
-                    // forward send() from the old instance
-                    //  to the new instance
-                    self.socket.send = _.bind(this.send, this);
-                    self.socket = this;
-                    self._settings = originalSettings;
-                },
-                close: function() {
-                    delay = Math.min(MAX_DELAY, delay * 2);
-                    console.log("Failed, retrying after", delay);
-                    setTimeout(reconnector, delay);
-                }
-            });
-        }
-
-        // go!
-        reconnector();
-    }
+    makeReconnectable(this, this.socket, url);
 
     this.$get = function() {
-        return self.socket;
+        // build a proxy for the socket whose method calls
+        //  always refer to the current instance of the socket
+        return _.reduce(['close', 'send', 'registerGlobal',
+                         'registerStatus', 'registerLocal'],
+        function(obj, funcName) {
+            obj[funcName] = function() {
+                self.socket[funcName].apply(self.socket, arguments);
+            }
+            return obj;
+        }, {});
     };
 });

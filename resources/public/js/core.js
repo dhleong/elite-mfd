@@ -9,6 +9,7 @@ angular.module('emfd')
     $rootScope.connected = false;
     $rootScope.everConnected = false;
 
+    window.ws = websocket;
     websocket.registerStatus('close', function() {
         $rootScope.$apply(function() {
             $rootScope.connected = false;
