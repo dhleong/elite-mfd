@@ -14,10 +14,10 @@
 
 (defn plot-route
   "Attempt to plot a route between two systems"
-  [& {:keys [start end jump-distance callback] :as opts}]
+  [& {:keys [start end jump-range callback] :as opts}]
   {:pre (every? identity opts)}
   (let [route-url (str base-url 
-                 jump-distance "/" 
+                 jump-range "/" 
                  (clean-name start) "/" 
                  (clean-name end))]
     (http/get

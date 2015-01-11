@@ -112,6 +112,19 @@ angular.module('emfd')
     };
 }])
 
+/** for when you don't know where "back" should go */
+.directive('backButton', ['$window', function($window) {
+    return {
+        restrict: 'A',
+        link: function (scope, elem) {
+            elem.bind('click', function () {
+                $window.history.back();
+                console.log("back", $window.history);
+            });
+        }
+    };
+}])
+
 .filter('bigNumber', function() {
     /**
      * If you have a unit after the number, for example,

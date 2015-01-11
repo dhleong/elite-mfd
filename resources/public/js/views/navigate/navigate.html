@@ -3,7 +3,7 @@
 </div>
 
 <div ui-content-for="navbutton-left">
-    <a href="#/">Back</a>
+    <a href="" back-button>Back</a>
 </div>
 
 <div class="scrollable">
@@ -24,9 +24,9 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="col-sm-2 control-label">Jump Distance</label>
+                        <label class="col-sm-2 control-label">Jump Range</label>
                         <div class="col-sm-4">
-                            <input type="number" class="form-control" ng-model="form['jump-distance']" />
+                            <input type="number" class="form-control" ng-model="form['jump-range']" />
                         </div>
 
                         <label class="col-sm-2 control-label">Turn-by-turn</label>
@@ -46,6 +46,11 @@
         <div class="list-group" ng-show="loading">
             <div class="list-group-item loading">
                 <i class="fa fa-spinner fa-spin loading-spinner"></i>
+            </div>
+        </div>
+        <div class="list-group" ng-show="error">
+            <div class="list-group-item">
+                {{ error }}
             </div>
         </div>
         <div class="list-group" ng-show="results != null">

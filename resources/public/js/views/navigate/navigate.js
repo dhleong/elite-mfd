@@ -18,7 +18,7 @@ angular.module('emfd.views.navigate', ['ngRoute'])
         type: 'navigate'
       , start: $routeParams.start
       , end: $routeParams.end
-      , 'jump-distance': 10 // TODO memorize
+      , 'jump-range': 10 // TODO memorize
     }
     $scope.results = null;
     $scope.loading = false;
@@ -62,7 +62,12 @@ angular.module('emfd.views.navigate', ['ngRoute'])
       , navigate_result: function(packet) {
             console.log("Got navigation:", packet);
             $scope.loading = false;
-            $scope.results = packet.result || [];
+            if (packet.result.error) {
+                $scope.results = null;
+                $scope.error = packet.result.errormsg;
+            } else {
+                $scope.results = packet.result || [];
+            }
 
             if ($scope.useTurnByTurn && $scope.results.length > 2) {
                 narrate((packet.result.length - 1)
@@ -78,6 +83,7 @@ angular.module('emfd.views.navigate', ['ngRoute'])
     $scope.onSearch = function() {
         websocket.send($scope.form);
         $scope.results = null;
+        $scope.error = null;
         $scope.loading = true;
     }
 }])
