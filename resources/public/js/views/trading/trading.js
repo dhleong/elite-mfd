@@ -23,6 +23,7 @@ angular.module('emfd.views.trading', ['ngRoute'])
       , 'station-name-end': null
       , cash: 1000 // TODO remember somehow?
       , cargo: 4
+      , 'max-distance': 1000
       , 'min-profit': 500
       , 'pad-size': 'Small'
       , 'search-range': '15'
