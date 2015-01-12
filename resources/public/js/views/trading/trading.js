@@ -5,7 +5,7 @@
 angular.module('emfd.views.trading', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
-    $routeProvider.when('/trading/:station', {
+    $routeProvider.when('/trading/:system/:station', {
         templateUrl: 'js/views/trading/trading.html'
       , controller: 'TradingController'
     });
@@ -16,9 +16,10 @@ angular.module('emfd.views.trading', ['ngRoute'])
         function($scope, $routeParams, websocket) {
 
     $scope.station = $routeParams.station;
+    $scope.system = $routeParams.system;
     $scope.form = {
         type: 'calculate'
-      , 'station-name': $scope.station
+      , 'station-name': $scope.station + ' (' + $scope.system + ')'
       , 'station-name-end': null
       , cash: 1000 // TODO remember somehow?
       , cargo: 4

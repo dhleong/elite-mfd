@@ -100,7 +100,7 @@ angular.module('emfd')
             }
 
             $scope.selectResult = function(row) {
-                $scope.autoStationsData.input = row.Station;
+                $scope.autoStationsData.input = row.Station + ' (' + row.System + ')';
                 $scope.onModalStationClosed(); // have to call manually
                 SharedState.set('modalStation', false);
             }

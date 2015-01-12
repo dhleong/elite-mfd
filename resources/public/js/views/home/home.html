@@ -24,7 +24,7 @@
             </div>
             <a ng-repeat="station in currentSystem.stations"
                    class="list-group-item"
-                   href="#/trading/{{ station }}">
+                   href="#/trading/{{ currentSystem.system }}/{{ station }}">
                {{ station }} <i class="fa fa-chevron-right pull-right"></i>
             </a>
         </div>

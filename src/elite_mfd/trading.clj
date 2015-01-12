@@ -58,26 +58,31 @@
    should accept a single argument which is either nil on error,
    or a vector containing suggested trades"
   [station-name-start &
-   {:keys [callback cargo cash station-name-end min-profit pad-size search-range]
+   {:keys [callback cargo cash station-name-end min-profit max-distance pad-size search-range]
     :or {callback identity
          cargo 4
          cash 1000
          min-profit 500
+         max-distance 1000 ; (from jump in) in Ls
          pad-size :Small
          search-range "15"}}]
+  (println station-name-start)
   (let [request-body {:Cargo cargo
                       :Cash cash
                       :EndStationId (station-id station-name-end)
+                      :MaxDistanceFromJumpIn max-distance
                       :MinProfit min-profit
                       :PadSize pad-size
                       :SearchRange search-range
                       :StartStationId (station-id station-name-start)}]
+    (println request-body)
     (http/post 
       calculate-url
       {:timeout 1000
        :headers {"Content-Type" "application/json"}
        :body (generate-string request-body)}
       (fn [{:keys [error body]}]
+        (println body)
         (if error
           (do 
             (log "! Error calculating:" error "Request:" request-body)
