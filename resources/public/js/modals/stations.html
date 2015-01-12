@@ -11,6 +11,7 @@
                     <div class="scrollable">
                         <div class="scrollable-header">
                             <input type="text" class="form-control" placeholder="Station Name" ng-model="autoStationsData.input" autofocus />
+                            <button class="clear-input close" ng-click="clearInput(this)">&times;</button>
                         </div>
                         <div class="scrollable-content">
                             <div class="list-group" ng-if="autoStationsData.results != null">

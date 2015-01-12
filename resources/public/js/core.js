@@ -91,6 +91,14 @@ angular.module('emfd')
                 $('html').removeClass("has-modal has-modal-overlay");
             }
 
+            $scope.clearInput = function() {
+                $scope.autoStationsData.input = '';
+                $scope.autoStationsData.result = null;
+
+                // re-focus
+                $('.modal-stations input').focus();
+            }
+
             $scope.selectResult = function(row) {
                 $scope.autoStationsData.input = row.Station;
                 $scope.onModalStationClosed(); // have to call manually

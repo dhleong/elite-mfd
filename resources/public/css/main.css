@@ -63,6 +63,13 @@
     padding-right: 0;
 }
 
+.clear-input {
+    position: absolute;
+    right: .5em;
+    top: 0;
+    bottom: 0;
+}
+
 .hidden {
     display: none;
 }
