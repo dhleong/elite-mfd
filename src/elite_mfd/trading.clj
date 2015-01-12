@@ -66,7 +66,6 @@
          max-distance 1000 ; (from jump in) in Ls
          pad-size :Small
          search-range "15"}}]
-  (println station-name-start)
   (let [request-body {:Cargo cargo
                       :Cash cash
                       :EndStationId (station-id station-name-end)
@@ -75,14 +74,13 @@
                       :PadSize pad-size
                       :SearchRange search-range
                       :StartStationId (station-id station-name-start)}]
-    (println request-body)
+    (log request-body)
     (http/post 
       calculate-url
       {:timeout 1000
        :headers {"Content-Type" "application/json"}
        :body (generate-string request-body)}
       (fn [{:keys [error body]}]
-        (println body)
         (if error
           (do 
             (log "! Error calculating:" error "Request:" request-body)
@@ -118,7 +116,7 @@
                       :SearchRange search-range
                       :SearchType (get search-types (keyword search-type))
                       :Shipyard (exists? has-shipyard)}]
-    (println request-body)
+    (log request-body)
     (http/post 
       search-url
       {:timeout 1000
