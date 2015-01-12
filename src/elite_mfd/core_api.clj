@@ -18,6 +18,7 @@
 (defonce cached-stations-map (ref nil))
 
 (defn parse-stations-map
+  "Produce a map of SystemName->[StationName...]"
   [array]
   (reduce
     (fn [smap info]
@@ -61,8 +62,13 @@
   ; NB if performance becomes a problem, we can certainly cache this as well...
   (if (nil? station-name)
     nil ; quick shortcut
-    (:StationId
-      (first 
-        (filter 
-          #(= station-name (:Station %))
-          (get-stations))))))
+    (let [pred 
+          (if-let [[_ station system] (re-find #"(.*) \((.*)\)" station-name)]
+            ;; system included
+            #(and (= station (:Station %)) (= system (:System %)))    
+            ;; just station
+            #(= station-name (:Station %)))]
+      (-> (filter pred (get-stations))
+          first
+          :StationId
+          ))))

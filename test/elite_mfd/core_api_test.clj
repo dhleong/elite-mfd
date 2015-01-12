@@ -14,7 +14,11 @@
     {\"StationId\": 3667, \"Station\": \"Aachen Town\",
     \"System\": \"Lalande 4141\", \"SystemId\": 43803 },
     {\"StationId\": 5200, \"Station\": \"Aaronson Landing\",
-    \"System\": \"Hehebeche\", \"SystemId\": 38226}
+    \"System\": \"Hehebeche\", \"SystemId\": 38226},
+    {\"StationId\": 1279, \"Station\": \"Aristotle Gateway\",
+    \"System\": \"Ross 780\", \"SystemId\": 1131},
+    {\"StationId\": 1397, \"Station\": \"Aristotle Gateway\",
+    \"System\": \"Yakabugai\", \"SystemId\": 51290}
     ]" 
     true))
 
@@ -26,5 +30,9 @@
      (is (= "Aaronson Landing" (first (get smap "Hehebeche"))))))
   (testing "station-id works"
     (is (nil? (station-id nil)))
-    (is (= 5200 (station-id "Aaronson Landing")))))
+    (is (= 5200 (station-id "Aaronson Landing")))
+    ;; without system, return the first match
+    (is (= 1279 (station-id "Aristotle Gateway")))
+    ;; return the right one if we include system
+    (is (= 1397 (station-id "Aristotle Gateway (Yakabugai)")))))
 
