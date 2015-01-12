@@ -83,6 +83,12 @@ angular.module('emfd')
                 // update the element with the input value
                 // $el.val($scope.autoStationsData.input.trim());
                 modelValue.assign($scope, $scope.autoStationsData.input.trim());
+
+                // gross dom hacks for better performance
+                //  on re-open. see below
+                $('stations-modal').remove();
+                $('#modals').find('.modal-stations').remove();
+                $('html').removeClass("has-modal has-modal-overlay");
             }
 
             $scope.selectResult = function(row) {
@@ -95,21 +101,37 @@ angular.module('emfd')
                 // DON'T focus; that would show the keyboard
                 $($el).blur();
 
-                SharedState.initialize($scope, 'modalStation', {defaultValue: true});
-
                 // show the modal for selection
                 if (!$scope._stationsDeployed) {
-                    $scope._stationsDeployed = true;
-                    var modal = $compile("<stations-modal></stations-modal>")($scope);
+                    SharedState.initialize($scope, 'modalStation', {defaultValue: true});
 
-                    $(document.body).append(modal);
                 } else {
                     SharedState.set('modalStation', true);
                 }
 
+                // NB for whatever reason, keeping the same element and just doing
+                //  a SharedState.set() introduces a significant delay when
+                //  re-opening. So, we'll use some gross hacks (see above) to
+                //  always re-create the element (without dumping bizarre error
+                //  messages to the console)
+                $scope._stationsDeployed = true;
+                var modal = $compile("<stations-modal></stations-modal>")($scope);
+
+                $(document.body).append(modal);
             });
         }
     };
+}])
+
+.directive('autofocus', ['$timeout', function($timeout) {
+    return {
+        restrict: 'A',
+        link: function(scope, el) {
+            $timeout(function() {
+                $(el).focus();
+            });
+        }
+    }
 }])
 
 /** for when you don't know where "back" should go */

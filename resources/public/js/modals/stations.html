@@ -1,10 +1,9 @@
 <div ui-content-for="modals">
-    <div class="modal modal-overlay modal-scrollable" ui-if='modalStation' ui-state='modalStation'>
+    <div class="modal modal-overlay modal-scrollable modal-stations" ui-if='modalStation' ui-state='modalStation'>
         <div class="modal-dialog">
             <div class="modal-content" >
                 <div class="modal-header">
                     <button class="close" 
-                            ui-turn-off="modalStation"
                             ng-click="onModalStationClosed()">&times;</button>
                     <h4 class="modal-title">Station Search</h4>
                 </div>
