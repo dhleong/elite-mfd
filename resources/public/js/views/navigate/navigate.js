@@ -29,7 +29,6 @@ angular.module('emfd.views.navigate', ['ngRoute'])
     };
 
     $scope.lastSystem = $rootScope.currentSystem.system;
-    $scope.jumpIndex = 0;
 
     websocket.registerLocal($scope, {
         on_system: function(packet) {
@@ -39,23 +38,43 @@ angular.module('emfd.views.navigate', ['ngRoute'])
                 return;
             }
 
+            if (!($scope.results && $scope.results.length)) {
+                // no navigation; doesn't matter
+                return;
+            }
+
+            // just loop through to see where we are
             var lastSystem = $scope.lastSystem;
-            $scope.lastSystem = packet.system;
-            var nextIndex = $scope.jumpIndex + 1;
-            if ($scope.results && $scope.results.length > nextIndex) {
-                // have we gone to the right place?
-                var nextName = $scope.results[nextIndex].name;
-                if (nextName != packet.system) {
-                    // TODO dynamic re-route?
-                    narrate("Unexpected jump; Please go to " + 
-                            nextName + " or return to " + lastSystem);
-                } else if ($scope.results.length - 1 == nextIndex) {
+            var currentIndex = -1;
+            for (var i=0; i < $scope.results.length; i++) {
+                // NB can't use inSystem because this might run BEFORE
+                //  the CoreController's listener
+                if ($rootScope.isSystem(packet.system, $scope.results[i].name)) {
+                    currentIndex = i;
+                    console.log("IN ", $scope.results[i].name, "->", currentIndex);
+                    break;
+                }
+            }
+
+            if (~currentIndex) {
+                // found!
+                $scope.lastSystem = packet.system;
+            } else if ($scope.useTurnByTurn) {
+                // nope :(
+                // TODO dynamic re-route?
+                narrate("Unexpected jump; Please return to " + lastSystem);
+                return;
+            }
+
+            if ($scope.useTurnByTurn) {
+                var nextIndex = currentIndex + 1;
+                if ($scope.results.length == nextIndex) {
                     narrate("You have arrived");
+                    $scope.useTurnByTurn = false;
                 } else {
                     // cool. proceed
-                    $scope.jumpIndex = nextIndex;
-                    narrate("Arrived in " + nextName);
-                    narrate("Next jump: " + $scope.results[nextIndex+1].name);
+                    narrate("Arrived in " + packet.system);
+                    narrate("Next jump: " + $scope.results[nextIndex].name);
                 }
             }
         }
