@@ -1,0 +1,65 @@
+<div ui-content-for="title">
+    {{ system }}
+</div>
+
+<div ui-content-for="navbutton-left">
+    <a href="" back-button>Back</a>
+</div>
+
+<div ui-content-for="navbutton-action">
+    <a href="#/navigate/{{ currentSystem.system }}/{{ system }}">Navigate</a>
+</div>
+
+<div class="scrollable">
+    <div class="scrollable-content">
+        <div class="list-group">
+            <div class="list-group-item">
+                <h3>{{ station }} 
+                    <small ng-if="distance && distanceFromJumpIn">{{ distance }}&nbsp;Ly <b>|</b> {{ distanceFromJumpIn|bigNumber:'&nbsp;' }}Ls</small>
+                </h3>
+
+                <legend class="station-subtitle" ng-if="subtitle">{{ subtitle }}</legend>
+
+                <div ng-if="ref == 'trading'">
+                    From <span class="station">{{ trade.StartingStationName }}</span> 
+                    Buy {{ trade.Qty }} {{ trade.CommodityName }} @ {{ trade.Buy }}<br>
+                    And sell them here for total profit: {{ trade.Total }}
+                </div>
+
+                <div ng-if="ref == 'search'">
+                    <div>
+                        {{ search.System.Allegiance.Name }} {{ search.System.Government.Name }} {{ search.Station.Economy.Name }}
+                    </div>
+                    <div>
+                        Has {{ search.Station.Services }}
+                    </div>
+
+                    <div ng-if="commodity">
+                        <!-- this looks weird, but it's true -->
+                        <div ng-if="searchType == 'selling'">
+                            Sells <i>{{ data.selectedCommodity.name }}</i> at <b>{{ search.Buy }}</b>
+                        </div>
+                        <div ng-if="searchType == 'buying'">
+                            Buys <i>{{ data.selectedCommodity.name }}</i> at <b>{{ search.Sell }}</b>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="list-group" ng-if="returnTrades">
+            <div class="list-group-item" ng-repeat="trade in returnTrades">
+                Buy {{ trade.Qty }} {{ trade.CommodityName }} @ {{ trade.Buy }}<br>
+                And return to {{ trade.DestinationStationName }} for profit: {{ trade.Total }}
+            </div>
+            <div class="list-group-item" ng-if="!returnTrades.length">
+                No profitable return trades
+            </div>
+        </div>
+
+        <div class="list-group" ng-if="!returnTrades">
+            <a class="list-group-item" href="#/trading/{{ system }}/{{ station }}?to={{ sName }} ({{ currentSystem.system }})" ng-repeat="sName in currentSystem.stations">Find Return Trades to {{ sName }}</a>
+        </div>
+    </div>
+</div>

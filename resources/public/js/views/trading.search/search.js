@@ -133,8 +133,8 @@ angular.module('emfd.views.trading.search', ['ngRoute', 'emfd'])
 }])
 
 .controller('SearchController', [
-        '$scope', '$routeParams', '$sce', 'websocket',
-        function($scope, $routeParams, $sce, websocket) {
+        '$scope', '$routeParams', '$sce', 'websocket', 'dataStore',
+        function($scope, $routeParams, $sce, websocket, dataStore) {
 
     var noFiltersDescription = $sce.trustAsHtml("(Edit Filters)");
     $scope.system = $routeParams.system;
@@ -209,10 +209,26 @@ angular.module('emfd.views.trading.search', ['ngRoute', 'emfd'])
 
     $scope.results = null;
 
+    // NB it might be better to shove these into the URL
+    //  or something....
+    if (dataStore.search
+            && dataStore.searchForm.system == $scope.form.system) {
+        // restore last results
+        $scope.results = dataStore.search;
+        $scope.data = dataStore.searchData;
+        $scope.form = dataStore.searchForm;
+        updateFilterDesc($scope.data);
+    } else {
+        // clear stale data
+        dataStore.search = null;
+        dataStore.searchForm = null;
+    }
+
+
     websocket.registerLocal($scope, {
         search_result: function(result) {
             console.log("Results!", result);
-            $scope.results = result.result;
+            $scope.results = dataStore.search = result.result;
         }
     });
 
@@ -229,6 +245,8 @@ angular.module('emfd.views.trading.search', ['ngRoute', 'emfd'])
 
         console.log("Search >>", $scope.form);
         $scope.results = null;
+        dataStore.searchForm = $scope.form;
+        dataStore.searchData = $scope.data;
         websocket.send($scope.form);
     };
 

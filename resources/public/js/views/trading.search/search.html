@@ -41,7 +41,7 @@
         <div ng-show="results != null" class="list-group">
             <div ng-hide="results.length" class="list-group-item">Nothing found</div>
             <!-- tap trade to calculate route -->
-            <a ng-repeat="r in results" class="list-group-item row" href="#/navigate/{{ form.system }}/{{ r.SystemName }}">
+            <a ng-repeat="r in results" class="list-group-item row" href="#/stations/{{ r.SystemName }}/{{ r.Station.Name }}/search?result={{ r }}&mode={{ form['search-type'] }}&commodity={{ data.selectedCommodity.name }}">
                 <div class="col-xs-7">
                     <div class="location">
                         {{ r.SystemName }} ({{ r.Station.Name }})

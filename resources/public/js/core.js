@@ -155,6 +155,12 @@ angular.module('emfd')
     };
 }])
 
+.factory('dataStore', function() {
+    // dumb service for storing temporary data
+    return {
+    };
+})
+
 .filter('bigNumber', function() {
     /**
      * If you have a unit after the number, for example,

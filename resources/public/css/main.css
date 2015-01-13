@@ -17,6 +17,11 @@
     font-size: 120%;
 }
 
+legend.station-subtitle {
+    margin-top: 1em;
+    margin-bottom: 0;
+}
+
 .app-content-loading {
   text-align: center;
   height: 100%;

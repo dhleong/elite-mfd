@@ -70,7 +70,7 @@
         <div ng-show="results != null" class="list-group">
             <!-- tap trade to calculate route? -->
             <div ng-hide="results.length" class="list-group-item">No trades found</div>
-            <a ng-repeat="trade in results" class="list-group-item" href="#/navigate/{{ currentSystem.system }}/{{ trade.DestinationSystemName }}">
+            <a ng-repeat="trade in results" class="list-group-item" href="#/stations/{{ trade.DestinationSystemName }}/{{ trade.DestinationStationName }}/trading?trade={{ trade }}&form={{ form }}">
                 <div class="commodity">
                     Buy ({{ trade.Qty }}) {{ trade.CommodityName }} @ {{ trade.Buy }}
                 </div>

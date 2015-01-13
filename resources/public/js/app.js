@@ -5,6 +5,7 @@ angular.module('emfd', [
     'ngRoute'
   , 'mobile-angular-ui'
   , 'emfd.views.home'
+  , 'emfd.views.stations'
   , 'emfd.views.trading'
   , 'emfd.views.trading.search'
   , 'emfd.views.navigate'
