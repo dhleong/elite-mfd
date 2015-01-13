@@ -58,7 +58,7 @@
                 No route found
             </div>
             <div class="list-group-item" 
-                    ng-class="{'current-navigation': currentSystem.system == r.name }"
+                    ng-class="{'current-navigation': inSystem(r.name) }"
                     ng-repeat="r in results">
                 <i ng-if="$first" class="fa fa-location-arrow"></i>
                 <i ng-if="$middle" class="fa fa-map-marker"></i>
