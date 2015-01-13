@@ -27,6 +27,19 @@ angular.module('emfd.views.navigate', ['ngRoute'])
     var narrate = function(text) {
         websocket.send({type:"narrate", text:text});
     };
+    /** 
+     * Tweak the string name of a system for better UX
+     *  when narrated */
+    narrate.system = function(systemName) {
+        return systemName.replace(/-/g, ' dash ')
+                         .replace(/(\d{3,})/g,
+                            function(match, p1) {
+                                // add a comma before it
+                                //  so the first number doesn't
+                                //  merge into the previous word
+                                return ',' + p1.replace(/(\d)/g, ' $1 ');
+                            });
+    }
 
     $scope.lastSystem = $rootScope.currentSystem.system;
 
@@ -51,7 +64,6 @@ angular.module('emfd.views.navigate', ['ngRoute'])
                 //  the CoreController's listener
                 if ($rootScope.isSystem(packet.system, $scope.results[i].name)) {
                     currentIndex = i;
-                    console.log("IN ", $scope.results[i].name, "->", currentIndex);
                     break;
                 }
             }
@@ -62,7 +74,8 @@ angular.module('emfd.views.navigate', ['ngRoute'])
             } else if ($scope.useTurnByTurn) {
                 // nope :(
                 // TODO dynamic re-route?
-                narrate("Unexpected jump; Please return to " + lastSystem);
+                narrate("Unexpected jump; Please return to " 
+                    + narrate.system(lastSystem));
                 return;
             }
 
@@ -73,8 +86,9 @@ angular.module('emfd.views.navigate', ['ngRoute'])
                     $scope.useTurnByTurn = false;
                 } else {
                     // cool. proceed
-                    narrate("Arrived in " + packet.system);
-                    narrate("Next jump: " + $scope.results[nextIndex].name);
+                    narrate("Arrived in " + narrate.system(packet.system));
+                    narrate("Next jump: " 
+                        + narrate.system($scope.results[nextIndex].name));
                 }
             }
         }
@@ -91,10 +105,10 @@ angular.module('emfd.views.navigate', ['ngRoute'])
             if ($scope.useTurnByTurn && $scope.results.length > 2) {
                 narrate((packet.result.length - 1)
                     + " jumps to reach "
-                    + $scope.form.end);
-                narrate("First jump: " + packet.result[1].name);
+                    + narrate.system($scope.form.end));
+                narrate("First jump: " + narrate.system(packet.result[1].name));
             } else if ($scope.useTurnByTurn && $scope.results.length) {
-                narrate("Jump directly to " + packet.result[1].name);
+                narrate("Jump directly to " + narrate.system(packet.result[1].name));
             }
         }
     });
