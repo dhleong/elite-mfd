@@ -9,7 +9,7 @@
 ;; Constants
 ;;
 (def stations-url 
-  "http://www.elitetradingtool.co.uk/api/EliteTradingTool/Stations?marketsOnly=true")
+  "http://elitetradingtool.co.uk/api/EliteTradingTool/Stations?marketsOnly=true")
 
 ;;
 ;; Globals

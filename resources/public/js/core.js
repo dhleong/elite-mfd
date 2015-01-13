@@ -8,6 +8,17 @@ angular.module('emfd')
 
     $rootScope.connected = false;
     $rootScope.everConnected = false;
+    $rootScope.currentSystem = null;
+
+    $rootScope.isSystem = function(candidate, systemName) {
+        return candidate.trim().toLowerCase() == systemName.trim().toLowerCase();
+    }
+    $rootScope.inSystem = function(systemName) {
+        // see issue #2
+        var current = $rootScope.currentSystem;
+        return current && systemName
+            && $rootScope.isSystem(current.system, systemName);
+    }
 
     window.ws = websocket;
     websocket.registerStatus('close', function() {

@@ -10,9 +10,9 @@
 ;; Constants
 ;;
 (def calculate-url 
-  "http://www.elitetradingtool.co.uk/api/EliteTradingTool/Calculator")
+  "http://elitetradingtool.co.uk/api/EliteTradingTool/Calculator")
 (def search-url 
-  "http://www.elitetradingtool.co.uk/api/EliteTradingTool/Search")
+  "http://elitetradingtool.co.uk/api/EliteTradingTool/Search")
 ;; mapping for search-stations :search-type arg value to API value
 (def search-types {:buying "Station Buying"
                    :selling "Station Selling"})
