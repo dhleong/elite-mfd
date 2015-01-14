@@ -1,4 +1,4 @@
-# elite-mfd
+# elite-mfd [![Build Status](http://img.shields.io/travis/dhleong/elite-mfd.svg?style=flat)](https://travis-ci.org/dhleong/elite-mfd)
 
 Fancy, contextual Elite: Dangerous tools
 
