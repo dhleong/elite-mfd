@@ -12,18 +12,18 @@ angular.module('emfd.views.navigate', ['ngRoute'])
 }])
 
 .controller('NavigateController', [
-        '$scope', '$routeParams', '$rootScope', 'websocket',
-        function($scope, $routeParams, $rootScope, websocket) {
+        '$scope', '$routeParams', '$rootScope', 'websocket', 'commander',
+        function($scope, $routeParams, $rootScope, websocket, cmdr) {
     $scope.form = {
         type: 'navigate'
       , start: $routeParams.start
       , end: $routeParams.end
-      , 'jump-range': 10 // TODO memorize
+      , 'jump-range': cmdr['jump-range']
     }
     $scope.endProvided = !!$routeParams.end;
     $scope.results = null;
     $scope.loading = false;
-    $scope.useTurnByTurn = false; // TODO memorize
+    $scope.useTurnByTurn = false; 
 
     var narrate = function(text) {
         websocket.send({type:"narrate", text:text});

@@ -4,6 +4,7 @@
   (:require [cheshire.core :refer [generate-string parse-string]]
             [elite-mfd
              [util :refer [log each-client to-client]]
+             [commander :as commander]
              [core-api :as api]
              [trading :as trading]
              [navigate :as navigate]  
@@ -44,6 +45,8 @@
     ;; if we know the system, tell them
     (if-let [system (:system @server)]
       (notify-system channel system))
+    ;; give them known commander values
+    (commander/on-connect channel)
     ;; pass incoming packets to registered handlers
     (on-receive channel 
                 (fn [data]
@@ -59,6 +62,7 @@
   (let [server (ref {:clients [] :system nil})
         handlers (-> {}
                      api/register-handlers
+                     commander/register-handlers
                      trading/register-handlers
                      navigate/register-handlers  
                      narrate/register-handlers)]

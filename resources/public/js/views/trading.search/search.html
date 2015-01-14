@@ -11,7 +11,7 @@
 
         <div class="list-group">
             <div class="list-group-item">
-                <form role="form" class="form-horizontal" ng-submit="onSearch()">
+                <form role="form" class="form-horizontal" ng-submit="onSearch()" ng-model-options="{getterSetter: true}">
                     <div class="form-group">
                         <label class="col-sm-12 control-label list-group-item">Filters</label>
                         <a class="col-sm-12 list-group-item filters" href="" ui-turn-on="modalFilter"><span ng-bind-html="filtersDescription"></span><i class="fa fa-chevron-right pull-right"></i></a>

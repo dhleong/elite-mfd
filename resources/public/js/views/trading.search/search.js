@@ -133,8 +133,8 @@ angular.module('emfd.views.trading.search', ['ngRoute', 'emfd'])
 }])
 
 .controller('SearchController', [
-        '$scope', '$routeParams', '$sce', 'websocket', 'dataStore',
-        function($scope, $routeParams, $sce, websocket, dataStore) {
+        '$scope', '$routeParams', '$sce', 'websocket', 'dataStore', 'commander',
+        function($scope, $routeParams, $sce, websocket, dataStore, cmdr) {
 
     var noFiltersDescription = $sce.trustAsHtml("(Edit Filters)");
     $scope.system = $routeParams.system;
@@ -142,11 +142,11 @@ angular.module('emfd.views.trading.search', ['ngRoute', 'emfd'])
         type: 'search'
       , system: $scope.system
       , 'search-type': 'selling'
-      , 'pad-size': 'Small'
-      , 'search-range': '15'
+      , 'pad-size': cmdr['pad-size']
+      , 'search-range': cmdr.prop('search-search-range', '15')
     };
 
-    $scope.validSizes = ['Small', 'Medium', 'Large'];
+    $scope.validSizes = cmdr.VALID_PAD_SIZES;
     $scope.validRanges = ['15', '25', '50', '100', '150'];
     $scope.validCommodities = COMMODITIES;
     $scope.validAllegiances = ALLEGIANCES;

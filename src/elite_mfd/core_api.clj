@@ -77,7 +77,8 @@
   "Given input, find matching system names"
   [raw-input]
   ;; NB This is not complete, since not all systems have stations.
-  ;; FIXME We need to forward to the actual API
+  ;; TODO We should forward to the actual API, in case they want to
+  ;;  navigate to a station-less system
   (ensure-stations-cached)
   (let [input (.toLowerCase raw-input)]
     (if-let [m @cached-stations-map]

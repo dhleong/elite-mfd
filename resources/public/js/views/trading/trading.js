@@ -12,8 +12,8 @@ angular.module('emfd.views.trading', ['ngRoute'])
 }])
 
 .controller('TradingController', [
-        '$scope', '$routeParams', 'websocket', 'dataStore',
-        function($scope, $routeParams, websocket, dataStore) {
+        '$scope', '$routeParams', 'websocket', 'dataStore', 'commander',
+        function($scope, $routeParams, websocket, dataStore, cmdr) {
 
     $scope.station = $routeParams.station;
     $scope.system = $routeParams.system;
@@ -21,15 +21,15 @@ angular.module('emfd.views.trading', ['ngRoute'])
         type: 'calculate'
       , 'station-name': $scope.station + ' (' + $scope.system + ')'
       , 'station-name-end': $routeParams.to
-      , cash: 1000 // TODO remember somehow?
-      , cargo: 4
-      , 'max-distance': 1000
-      , 'min-profit': 500
-      , 'pad-size': 'Small'
-      , 'search-range': '15'
+      , cash: cmdr.cash
+      , cargo: cmdr.cargo
+      , 'max-distance': cmdr.prop('trading-max-distance', 1000)
+      , 'min-profit': cmdr.prop('min-profit', 500)
+      , 'pad-size': cmdr['pad-size']
+      , 'search-range': cmdr.prop('trading-search-range', '15')
     };
 
-    $scope.validSizes = ['Small', 'Medium', 'Large'];
+    $scope.validSizes = cmdr.VALID_PAD_SIZES;
     $scope.validRanges = ['15', '25', '50'];
 
     if (dataStore.trading 

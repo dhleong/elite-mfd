@@ -10,7 +10,7 @@
     <div class="scrollable-content">
         <div class="list-group">
             <div class="list-group-item">
-                <form role="form" class="form-horizontal" ng-submit="onCalculate()">
+                <form role="form" class="form-horizontal" ng-submit="onCalculate()" ng-model-options="{getterSetter: true}">
                     <legend>Trading from {{ station }}</legend>
                     <div class="form-group">
                         <label class="col-sm-12 control-label">Destination</label>

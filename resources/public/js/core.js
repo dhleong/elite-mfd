@@ -97,8 +97,12 @@ var autoDirectiveFactory = function(requestType, responseType, formatter) {
 
 angular.module('emfd')
 
-.controller('CoreController', ['$rootScope', 'websocket',
-        function($rootScope, websocket) {
+.controller('CoreController', ['$rootScope', 'commander', 'websocket',
+        function($rootScope, commander, websocket) {
+
+    // NB we don't actually need the commander service here,
+    //  but we'll inject it so it gets initialized in time
+    //  to register the `commander-data` packet listener
 
     $rootScope.connected = false;
     $rootScope.everConnected = false;
