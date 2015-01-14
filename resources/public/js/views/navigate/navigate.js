@@ -115,7 +115,9 @@ angular.module('emfd.views.navigate', ['ngRoute'])
     });
 
     $scope.onSearch = function() {
-        websocket.send($scope.form);
+        var packet = cmdr.form($scope.form);
+        console.log('>>', packet);
+        websocket.send(packet);
         $scope.results = null;
         $scope.error = null;
         $scope.loading = true;

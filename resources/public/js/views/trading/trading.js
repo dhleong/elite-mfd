@@ -51,9 +51,10 @@ angular.module('emfd.views.trading', ['ngRoute'])
     });
 
     $scope.onCalculate = function() {
-        console.log($scope.form);
+        var packet = cmdr.form($scope.form);
+        console.log('>>', packet);
         dataStore.tradingForm = $scope.form;
-        websocket.send($scope.form);
+        websocket.send(packet);
     };
 }]);
 

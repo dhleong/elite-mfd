@@ -20,6 +20,7 @@
                  jump-range "/" 
                  (clean-name start) "/" 
                  (clean-name end))]
+    (println route-url)
     (http/get
       route-url
       {:timeout 7500}

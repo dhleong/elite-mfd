@@ -243,11 +243,12 @@ angular.module('emfd.views.trading.search', ['ngRoute', 'emfd'])
         setFormIdFromData('government-id', 'selectedGovernment');
         setFormIdFromData('economy-id', 'selectedEconomy');
 
-        console.log("Search >>", $scope.form);
+        var packet = cmdr.form($scope.form);
+        console.log("Search >>", packet);
         $scope.results = null;
         dataStore.searchForm = $scope.form;
         dataStore.searchData = $scope.data;
-        websocket.send($scope.form);
+        websocket.send(packet);
     };
 
     $scope.onFilterClosed = function() {

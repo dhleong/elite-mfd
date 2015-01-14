@@ -85,5 +85,18 @@ angular.module('emfd')
         return service[name];
     }
 
+    /* Given a form dict, replace any of our getters
+     * with their current value */
+    service.form = function(form) {
+        return _.reduce(_.keys(form),
+        function(result, key) {
+            var val = form[key];
+            result[key] = _.isFunction(val)
+                ? val()
+                : val;
+            return result;
+        }, {});
+    }
+
     return service;
 }]);
