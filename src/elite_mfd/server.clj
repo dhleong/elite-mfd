@@ -4,7 +4,7 @@
   (:require [cheshire.core :refer [generate-string parse-string]]
             [elite-mfd
              [util :refer [log each-client to-client]]
-             [core-api :refer [get-system-stations]]
+             [core-api :as api]
              [trading :as trading]
              [navigate :as navigate]  
              [narrate :as narrate]])
@@ -29,7 +29,7 @@
   (to-client client
              {:type :on-system
               :system system
-              :stations (get-system-stations system)}))
+              :stations (api/get-system-stations system)}))
 
 (defn- client-handler
   [server handlers request]
@@ -58,6 +58,7 @@
   [port]
   (let [server (ref {:clients [] :system nil})
         handlers (-> {}
+                     api/register-handlers
                      trading/register-handlers
                      navigate/register-handlers  
                      narrate/register-handlers)]

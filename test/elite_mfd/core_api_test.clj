@@ -36,3 +36,8 @@
     ;; return the right one if we include system
     (is (= 1397 (station-id "Aristotle Gateway (Yakabugai)")))))
 
+(deftest systems-filter
+  (testing "case insenstive"
+    (is (contains?
+         (set (filter-systems "era"))
+         "Eravate"))))

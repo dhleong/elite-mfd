@@ -16,7 +16,7 @@
                         <div class="scrollable-content">
                             <div class="list-group" ng-if="autoStationsData.results != null">
                                 <div ng-if="!autoStationsData.results" class="list-group-item">No Stations Found</div>
-                                <a class="list-group-item" href ng-repeat="r in autoStationsData.results" ng-click="selectResult(r)">{{ r.Station }} ({{ r.System }})</a>
+                                <a class="list-group-item" href ng-repeat="r in autoStationsData.results" ng-click="selectResult(r)">{{ r }}</a>
                             </div>
                         </div>
                     </div>

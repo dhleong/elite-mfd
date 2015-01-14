@@ -3,7 +3,7 @@
   elite-mfd.core-api
   (:require [cheshire.core :refer [parse-string]]
             [org.httpkit.client :as http]
-            [elite-mfd.util :refer [log]]))
+            [elite-mfd.util :refer [log to-client client-error]]))
 
 ;;
 ;; Constants
@@ -72,3 +72,34 @@
           first
           :StationId
           ))))
+
+(defn filter-systems
+  "Given input, find matching system names"
+  [raw-input]
+  ;; NB This is not complete, since not all systems have stations.
+  ;; FIXME We need to forward to the actual API
+  (ensure-stations-cached)
+  (let [input (.toLowerCase raw-input)]
+    (if-let [m @cached-stations-map]
+      (->> (keys m)
+           (filter #(and (not (nil? %))
+                         (.contains (.toLowerCase %) input))))
+      []))) ; grace 
+
+(defn on-systems
+  "System search handler"
+  [ch packet]
+  (if-let [q (:q packet)]
+    (to-client ch {:type :systems-result
+                   :q q ;; give back q to ignore old queries
+                   :result (take 100 (filter-systems q))})
+    (client-error ch "No query provided")))
+
+;;
+;; Registration
+;;
+(defn register-handlers
+  "Interface used by server for registering websocket packet handlers"
+  [handlers]
+  (assoc handlers
+         :systems on-systems))

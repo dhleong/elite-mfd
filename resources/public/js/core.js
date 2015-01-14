@@ -1,5 +1,99 @@
 'use strict';
-/* global angular */
+/* global angular, _ */
+
+var autoDirectiveFactory = function(requestType, responseType, formatter) {
+    return ['$compile', '$parse', 'SharedState', 'websocket', 
+        function($compile, $parse, SharedState, $websocket) {
+            return {
+                restrict: 'A',
+                link: function($scope, $el, $attrs) {
+                    $scope._stationsDeployed = false;
+                    $scope.autoStationsData = {
+                        input: $($el).val() // prefill with current
+                      , results: null
+                    };
+                    var modelValue = $parse($attrs.ngModel);
+
+                    // if we wanted to be fancier about registerLocal to not
+                    //  totally override then we'd have less boilerplate here,
+                    //  but so far this is the only case where we'd need that....
+                    $websocket.registerGlobal(responseType, function(packet) {
+                        if (packet.q != $scope.autoStationsData.input) 
+                            return;
+                        $scope.$apply(function() {
+                            $scope.autoStationsData.results = _.map(packet.result, formatter);
+                            console.log($scope.autoStationsData.results);
+                        });
+                    });
+                    $scope.$on('$destroy', function() {
+                        // unregister
+                        $websocket.registerGlobal(responseType, null);
+                    });
+
+                    $scope.$watch('autoStationsData.input', function(newValue) {
+                        if (newValue.length > 1) {
+                            $websocket.send({
+                                type: requestType
+                              , q: newValue
+                            });
+                        } else if (!newValue.length) {
+                            $scope.autoStationsData.results = null;
+                        }
+                    });
+
+                    $scope.onModalStationClosed = function() {
+                        // update the element with the input value
+                        // $el.val($scope.autoStationsData.input.trim());
+                        modelValue.assign($scope, $scope.autoStationsData.input.trim());
+
+                        // gross dom hacks for better performance
+                        //  on re-open. see below
+                        $('stations-modal').remove();
+                        $('#modals').find('.modal-stations').remove();
+                        $('html').removeClass("has-modal has-modal-overlay");
+                    }
+
+                    $scope.clearInput = function() {
+                        $scope.autoStationsData.input = '';
+                        $scope.autoStationsData.result = null;
+
+                        // re-focus
+                        $('.modal-stations input').focus();
+                    }
+
+                    $scope.selectResult = function(row) {
+                        $scope.autoStationsData.input = row;
+                        $scope.onModalStationClosed(); // have to call manually
+                        SharedState.set('modalStation', false);
+                    }
+
+                    $($el).focus(function() {
+                        // DON'T focus; that would show the keyboard
+                        $($el).blur();
+
+                        // show the modal for selection
+                        if (!$scope._stationsDeployed) {
+                            SharedState.initialize($scope, 'modalStation', {defaultValue: true});
+
+                        } else {
+                            SharedState.set('modalStation', true);
+                        }
+
+                        // NB for whatever reason, keeping the same element and just doing
+                        //  a SharedState.set() introduces a significant delay when
+                        //  re-opening. So, we'll use some gross hacks (see above) to
+                        //  always re-create the element (without dumping bizarre error
+                        //  messages to the console)
+                        $scope._stationsDeployed = true;
+                        var modal = $compile("<stations-modal></stations-modal>")($scope);
+
+                        $(document.body).append(modal);
+                    });
+                }
+            };
+        }
+    ];
+}
 
 angular.module('emfd')
 
@@ -52,95 +146,13 @@ angular.module('emfd')
     }
 })
 
-.directive('autoStations', ['$compile', '$parse', 'SharedState', 'websocket', 
-        function($compile, $parse, SharedState, $websocket) {
-    return {
-        restrict: 'A',
-        link: function($scope, $el, $attrs) {
-            $scope._stationsDeployed = false;
-            $scope.autoStationsData = {
-                input: $($el).val() // prefill with current
-              , results: null
-            };
-            var modelValue = $parse($attrs.ngModel);
+.directive('autoStations', autoDirectiveFactory('stations', 'stations_result',
+        function formatter(row) {
+    return row.Station + ' (' + row.System + ')'
+}))
 
-            // if we wanted to be fancier about registerLocal to not
-            //  totally override then we'd have less boilerplate here,
-            //  but so far this is the only case where we'd need that....
-            $websocket.registerGlobal("stations_result", function(packet) {
-                if (packet.q != $scope.autoStationsData.input) 
-                    return;
-                $scope.$apply(function() {
-                    $scope.autoStationsData.results = packet.result;
-                });
-            });
-            $scope.$on('$destroy', function() {
-                // unregister
-                $websocket.registerGlobal('stations_result', null);
-            });
-
-            $scope.$watch('autoStationsData.input', function(newValue) {
-                if (newValue.length > 1) {
-                    $websocket.send({
-                        type: "stations"
-                      , q: newValue
-                    });
-                } else if (!newValue.length) {
-                    $scope.autoStationsData.results = null;
-                }
-            });
-
-            $scope.onModalStationClosed = function() {
-                // update the element with the input value
-                // $el.val($scope.autoStationsData.input.trim());
-                modelValue.assign($scope, $scope.autoStationsData.input.trim());
-
-                // gross dom hacks for better performance
-                //  on re-open. see below
-                $('stations-modal').remove();
-                $('#modals').find('.modal-stations').remove();
-                $('html').removeClass("has-modal has-modal-overlay");
-            }
-
-            $scope.clearInput = function() {
-                $scope.autoStationsData.input = '';
-                $scope.autoStationsData.result = null;
-
-                // re-focus
-                $('.modal-stations input').focus();
-            }
-
-            $scope.selectResult = function(row) {
-                $scope.autoStationsData.input = row.Station + ' (' + row.System + ')';
-                $scope.onModalStationClosed(); // have to call manually
-                SharedState.set('modalStation', false);
-            }
-
-            $($el).focus(function() {
-                // DON'T focus; that would show the keyboard
-                $($el).blur();
-
-                // show the modal for selection
-                if (!$scope._stationsDeployed) {
-                    SharedState.initialize($scope, 'modalStation', {defaultValue: true});
-
-                } else {
-                    SharedState.set('modalStation', true);
-                }
-
-                // NB for whatever reason, keeping the same element and just doing
-                //  a SharedState.set() introduces a significant delay when
-                //  re-opening. So, we'll use some gross hacks (see above) to
-                //  always re-create the element (without dumping bizarre error
-                //  messages to the console)
-                $scope._stationsDeployed = true;
-                var modal = $compile("<stations-modal></stations-modal>")($scope);
-
-                $(document.body).append(modal);
-            });
-        }
-    };
-}])
+.directive('autoSystems', autoDirectiveFactory('systems', 'systems_result',
+        function formatter(row) { return row; }))
 
 .directive('autofocus', ['$timeout', function($timeout) {
     return {

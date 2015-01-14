@@ -1,6 +1,11 @@
 <div ui-content-for="bottom-nav" ng-if="currentSystem">
     <div class="btn-group justified" >
-        <a href="#/search/{{ currentSystem.system }}" class="btn btn-navbar">Search</a>
+        <a href="#/search/{{ currentSystem.system }}" class="btn btn-navbar">
+            <i class="fa fa-search fa-navbar"></i> Search
+        </a>
+        <a href="#/navigate/{{ currentSystem.system }}" class="btn btn-navbar">
+            <i class="fa fa-compass fa-navbar"></i> Navigate
+        </a>
     </div>
 </div>
 

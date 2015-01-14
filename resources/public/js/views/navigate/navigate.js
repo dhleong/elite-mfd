@@ -5,7 +5,7 @@
 angular.module('emfd.views.navigate', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
-    $routeProvider.when('/navigate/:start/:end', {
+    $routeProvider.when('/navigate/:start/:end?', {
         templateUrl: 'js/views/navigate/navigate.html'
       , controller: 'NavigateController'
     });
@@ -20,6 +20,7 @@ angular.module('emfd.views.navigate', ['ngRoute'])
       , end: $routeParams.end
       , 'jump-range': 10 // TODO memorize
     }
+    $scope.endProvided = !!$routeParams.end;
     $scope.results = null;
     $scope.loading = false;
     $scope.useTurnByTurn = false; // TODO memorize
