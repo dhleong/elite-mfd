@@ -8,12 +8,12 @@
 (def dummy-plot-result
   "[{\"jump\":0,\"name\":\"Yakabugai\",\"distance\":\"0\"},{\"jump\":1,\"name\":\"Chamunda\",\"distance\":\"4.3770084675495\"},{\"jump\":2,\"name\":\"LTT 18486\",\"distance\":\"7.9636012778453\"}]")
 
-(defn- do-test [func & {:keys [start end jump-distance then]} ]
+(defn- do-test [func & {:keys [start end jump-range then]} ]
   (let [called (ref false)
         result @(func
                   :start start
                   :end end
-                  :jump-distance jump-distance
+                  :jump-range jump-range
                   :callback (fn [result]
                               (dosync (ref-set called true))
                               (then result)))]
@@ -30,7 +30,7 @@
         plot-route
         :start "Yakabugai " ; sic: just in case, we trim off whitespace
         :end "LTT 18486"
-        :jump-distance 10
+        :jump-range 10
         :then (fn [result]
                 (is (seq? result))
                 (is (= 3 (count result)))
