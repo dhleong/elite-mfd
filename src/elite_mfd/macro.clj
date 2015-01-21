@@ -73,6 +73,7 @@
   "Evaluate a macro as a series of binding presses"
   [bindings]
   (doseq [bind bindings]
+    (println (-> bind binding-to-vk))
     (-> bind
         binding-to-vk
         key-tap)))
@@ -83,6 +84,7 @@
 (defn on-macro
   [_ packet]
   (when-let [macro (:macro packet)]
+    (log "Perform macro:" macro)
     (evaluate-macro macro)))
 
 ;;

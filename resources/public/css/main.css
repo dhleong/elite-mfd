@@ -22,6 +22,11 @@ legend.station-subtitle {
     margin-bottom: 0;
 }
 
+a.macro {
+    font-size: 1.5em;
+    padding: 1.5em;
+}
+
 .app-content-loading {
   text-align: center;
   height: 100%;

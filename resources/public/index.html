@@ -12,14 +12,26 @@
         <link rel="stylesheet" href="css/main.css" type="text/css" media="all" />
     </head>
     <body>
-        <div class="app">
+
+        <!-- Sidebars -->
+        <div ng-include="'js/views/macros/bar.html'" 
+                class="sidebar sidebar-left">
+        </div>
+
+        <div class="app"
+                ng-swipe-right='Ui.turnOn("uiSidebarLeft")'
+                ng-swipe-left='Ui.turnOff("uiSidebarLeft")'>
             <div class="navbar navbar-app navbar-absolute-top" ng-class="{'disabled': !connected}">
                 <div class="navbar-brand navbar-brand-center" ui-yield-to="title">
                     Elite MFD
                 </div>
 
                 <div class="btn-group pull-left" ng-class="{'hidden': !connected}">
-                    <div class="btn btn-navbar" ui-yield-to="navbutton-left"></div>
+                    <div class="btn btn-navbar" ui-yield-to="navbutton-left">
+                        <div ui-toggle="uiSidebarLeft" class="btn sidebar-toggle">
+                            <i class="fa fa-bars"></i>&nbsp;QC
+                        </div>
+                    </div>
                 </div>
 
                 <div class="btn-group pull-right" ng-class="{'hidden': !connected}">
@@ -58,6 +70,7 @@
         <script src="js/commander.js" type="text/javascript" charset="utf-8"></script>
         <script src="js/core.js" type="text/javascript" charset="utf-8"></script>
         <script src="js/views/home/home.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/views/macros/macros.js" type="text/javascript" charset="utf-8"></script>
         <script src="js/views/stations/stations.js" type="text/javascript" charset="utf-8"></script>
         <script src="js/views/trading/trading.js" type="text/javascript" charset="utf-8"></script>
         <script src="js/views/trading.search/search.js" type="text/javascript" charset="utf-8"></script>

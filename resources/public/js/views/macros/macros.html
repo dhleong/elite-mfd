@@ -1,0 +1,28 @@
+<div class="scrollable">
+    <div class="scrollable-content">
+        <!-- bindings -->
+        <div class="list-group">
+            <div class="list-group-item">
+                <form role="form" class="form-horizontal" ng-submit="doSave()">
+                    <legend>Bindings</legend>
+                    <div class="form-group">
+                        <div ng-repeat="(bind, keyName) in bindings">
+                            <label class="col-xs-6 control-label">{{ bind }}</label>
+                            <div class="col-xs-6">
+                                <input type="text" class="form-control" ng-model="bindings[bind]" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary btn-block">Save</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- macros -->
+        <div class="list-group">
+            <!-- <a class="list&#45;group&#45;item macro" href="" ng&#45;repeat="m in macros.list">{{ m.name }}</a> -->
+        </div>
+    </div>
+</div>
+
