@@ -4,6 +4,7 @@
 angular.module('emfd', [
     'ngRoute'
   , 'mobile-angular-ui'
+  , 'mobile-angular-ui.gestures'
   , 'emfd.views.home'
   , 'emfd.views.macros'
   , 'emfd.views.stations'
