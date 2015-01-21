@@ -1,7 +1,9 @@
 (ns ^{:author "Daniel Leong"
       :doc "Macro support"} 
   elite-mfd.macro
-  (:require [elite-mfd.util :refer [log]])
+  (:require [elite-mfd
+             [commander :as cmdr]
+             [util :refer [log]]])
   (:import  [java.awt Robot AWTException]))
 
 ;; Without this, the Robot init would create a dock icon on OSX
@@ -13,12 +15,16 @@
              (Robot.)
              (catch AWTException e)))
 
-;; TODO read these from commander settings
-(def cmdr-bindings {:navigation "1"
-                    :tab-right "e"
-                    :ui-down "down"
-                    :ui-right "right"
-                    :ui-select "space"})
+(def default-cmdr-bindings {:navigation "1"
+                            :tab-right "e"
+                            :ui-down "down"
+                            :ui-right "right"
+                            :ui-select "space"})
+
+(defn- cmdr-bindings []
+  (if-let [existing (cmdr/get-field :bindings)]
+    existing
+    default-cmdr-bindings))
 
 (defn key-tap
   "Quickly tap the keyCode"
@@ -38,7 +44,7 @@
 
 (defn binding-to-vk
   [bind]
-  (if-let [raw-key (get cmdr-bindings (keyword bind))]
+  (if-let [raw-key (get (cmdr-bindings) (keyword bind))]
     (vk raw-key)
     (throw (IllegalArgumentException. (str "No such binding:" bind)))))
 
@@ -70,3 +76,20 @@
     (-> bind
         binding-to-vk
         key-tap)))
+
+;;
+;; Handlers
+;;
+(defn on-macro
+  [_ packet]
+  (when-let [macro (:macro packet)]
+    (evaluate-macro macro)))
+
+;;
+;; Registration
+;;
+(defn register-handlers
+  "Interface used by server for registering websocket packet handlers"
+  [handlers]
+  (assoc handlers
+         :macro on-macro))

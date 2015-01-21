@@ -6,6 +6,7 @@
              [util :refer [log each-client to-client]]
              [commander :as commander]
              [core-api :as api]
+             [macro :as macro]
              [trading :as trading]
              [navigate :as navigate]  
              [narrate :as narrate]])
@@ -63,6 +64,7 @@
         handlers (-> {}
                      api/register-handlers
                      commander/register-handlers
+                     macro/register-handlers
                      trading/register-handlers
                      navigate/register-handlers  
                      narrate/register-handlers)]
