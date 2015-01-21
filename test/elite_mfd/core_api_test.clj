@@ -31,10 +31,11 @@
   (testing "station-id works"
     (is (nil? (station-id nil)))
     (is (= 5200 (station-id "Aaronson Landing")))
-    ;; without system, return the first match
-    (is (= 1279 (station-id "Aristotle Gateway")))
+    ;; without system, return (any) match
+    (is (not (nil? (station-id "Aristotle Gateway"))))
     ;; return the right one if we include system
-    (is (= 1397 (station-id "Aristotle Gateway (Yakabugai)")))))
+    (is (= 1397 (station-id "Aristotle Gateway (Yakabugai)")))  
+    (is (= 1279 (station-id "Aristotle Gateway (Ross 780)")))))
 
 (deftest systems-filter
   (testing "case insenstive"
