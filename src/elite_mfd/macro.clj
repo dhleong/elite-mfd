@@ -2,9 +2,16 @@
       :doc "Macro support"} 
   elite-mfd.macro
   (:require [elite-mfd.util :refer [log]])
-  (:import  [java.awt Robot]))
+  (:import  [java.awt Robot AWTException]))
 
-(def robot (Robot.))
+;; Without this, the Robot init would create a dock icon on OSX
+;;  Not a big deal, but may be nicer when OSX client is released
+(System/setProperty "apple.awt.UIElement" "false")
+
+;; NB travis runs in a headless env, so the following would crash
+(def robot (try 
+             (Robot.)
+             (catch AWTException e)))
 
 ;; TODO read these from commander settings
 (def cmdr-bindings {:navigation "1"
