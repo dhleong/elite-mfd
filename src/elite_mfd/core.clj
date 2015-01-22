@@ -1,3 +1,9 @@
+;; Without this, we create a dock icon on OSX.
+;;  Not a big deal, but may be nicer when OSX client is released
+;;  since we should be run in a terminal anyway...
+(System/setProperty "apple.awt.UIElement" "true")
+
+;; Normal namespace setup
 (ns ^{:author "Daniel Leong"
       :doc "Config/Prep/Startup"} 
   elite-mfd.core
@@ -17,9 +23,9 @@
   (:import  [java.io RandomAccessFile])
   (:gen-class))
 
-;
-; Config
-;
+;;
+;; Config
+;;
 (def app-data (file (System/getProperty "user.home") "AppData"))
 (def product-root (if (.exists app-data) 
                     ; actual windows machine
@@ -30,9 +36,9 @@
 (def websockets-port 9877)
 (def nrepl-port 7888)
 
-;
-; Constants
-;
+;;
+;; Constants
+;;
 (def product-name "FORC-FDEV-D-1010")
 (def product-dir (file product-root product-name))
 (def app-config-path (file product-dir "AppConfig.xml"))
@@ -149,5 +155,3 @@
         system-poll-future (future (system-poller system-callback))]
     system-poll-future
     ))
-
-;; (-main)

@@ -6,10 +6,6 @@
              [util :refer [log]]])
   (:import  [java.awt Robot AWTException]))
 
-;; Without this, the Robot init would create a dock icon on OSX
-;;  Not a big deal, but may be nicer when OSX client is released
-(System/setProperty "apple.awt.UIElement" "false")
-
 ;; NB travis runs in a headless env, so the following would crash
 (def robot (try 
              (Robot.)
