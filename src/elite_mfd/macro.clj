@@ -14,8 +14,11 @@
 (def robot (try 
              (Robot.)
              (catch AWTException e)))
-
+;; hand-tuned. If it works in my VM, it should work for everyone
+(def tap-delay 80)
+;; this is enough for a default "request docking" macro
 (def default-cmdr-bindings {:navigation "1"
+                            :tab-left "q"
                             :tab-right "e"
                             :ui-down "down"
                             :ui-right "right"
@@ -31,7 +34,9 @@
   [keyCode]
   (doto robot
     (.keyPress keyCode)
-    (.keyRelease keyCode)))
+    (.delay tap-delay)
+    (.keyRelease keyCode)
+    (.delay tap-delay)))
 
 (defn vk
   "Given a string name like 'down', returns the

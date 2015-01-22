@@ -1,16 +1,18 @@
 'use strict';
 /* global angular, _ */
+/* jshint indent: false */
 
 var REQUEST_DOCKING = {
     name: "Request Docking", 
     value: ["navigation", "tab-right", "tab-right",
             "ui-select", "ui-down", "ui-select",
-            "navigation"]
+            "tab-left", "tab-left", "navigation"]
 };
 
 // would be nice to pull this from the server somehow...
 var DEFAULT_BINDINGS = {
     "navigation": "1",
+    "tab-left": "q",
     "tab-right": "e",
     "ui-down": "down",
     "ui-right": "right",
