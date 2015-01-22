@@ -64,6 +64,7 @@
                 <i ng-if="$middle" class="fa fa-map-marker"></i>
                 <i ng-if="$last" class="fa fa-flag-checkered"></i>
                 <span class="navigation-name">{{ r.name }}</span>
+                <span class="navigation-distance" ng-if="!$first">{{ r.distance|number:1 }} Ly</span>
             </div>
         </div>
     </div>

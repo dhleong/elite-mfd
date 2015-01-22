@@ -2,6 +2,8 @@
 /* jshint indent:false */
 /* global angular */
 
+var LONG_JOURNEY_SIZE = 5;
+
 angular.module('emfd.views.navigate', ['ngRoute'])
 
 .config(['$routeProvider', function($routeProvider) {
@@ -30,7 +32,8 @@ angular.module('emfd.views.navigate', ['ngRoute'])
     };
     /** 
      * Tweak the string name of a system for better UX
-     *  when narrated */
+     *  when narrated
+     */
     narrate.system = function(systemName) {
         return systemName.replace(/-/g, ' dash ')
                          .replace(/(\d{3,})/g,
@@ -40,6 +43,12 @@ angular.module('emfd.views.navigate', ['ngRoute'])
                                 //  merge into the previous word
                                 return ',' + p1.replace(/(\d)/g, ' $1 ');
                             });
+    }
+    /** Describe a jump; includes distance and cleaned name */
+    narrate.jump = function(jumpInfo) {
+        return parseInt(jumpInfo.distance) 
+            + " light years to " 
+            + narrate.system(jumpInfo.name);
     }
 
     $scope.lastSystem = $rootScope.currentSystem.system;
@@ -89,7 +98,16 @@ angular.module('emfd.views.navigate', ['ngRoute'])
                     // cool. proceed
                     narrate("Arrived in " + narrate.system(packet.system));
                     narrate("Next jump: " 
-                        + narrate.system($scope.results[nextIndex].name));
+                        + narrate.jump($scope.results[nextIndex]));
+
+                    if ($scope.results.length >= LONG_JOURNEY_SIZE) {
+                        // NB there are len-1 jumps, because [0] is the start
+                        if (nextIndex == $scope.results.length - 1) {
+                            narrate("Last jump");
+                        } else {
+                            narrate(($scope.results.length - nextIndex) + " jumps remaining");
+                        }
+                    }
                 }
             }
         }
@@ -107,7 +125,7 @@ angular.module('emfd.views.navigate', ['ngRoute'])
                 narrate((packet.result.length - 1)
                     + " jumps to reach "
                     + narrate.system($scope.form.end));
-                narrate("First jump: " + narrate.system(packet.result[1].name));
+                narrate("First jump: " + narrate.jump(packet.result[1]));
             } else if ($scope.useTurnByTurn && $scope.results.length) {
                 narrate("Jump directly to " + narrate.system(packet.result[1].name));
             }
