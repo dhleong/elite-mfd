@@ -74,8 +74,16 @@ angular.module('emfd.views.macros', ['ngRoute'])
         '$scope', 'websocket', 'commander',
         function($scope, websocket, cmdr) {
 
+    var macros = cmdr.prop('macros', []);
+        
     // it's kinda BS that we can't use the getterSetter here...
-    $scope.macros = cmdr.prop('macros', [])();
+    $scope.macros = macros();
+
+    // handle race condition where we haven't
+    //  gotten the cmdr data yet
+    $scope.$on('emfd.commander-data', function() {
+        $scope.macros = macros();
+    });
 
     $scope.sendMacro = function(item) {
         websocket.send({

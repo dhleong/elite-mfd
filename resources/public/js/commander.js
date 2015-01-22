@@ -28,11 +28,12 @@
  *
  */
 angular.module('emfd')
-.factory('commander', ['websocket', function($ws) {
+.factory('commander', ['$rootScope', 'websocket', function($rootScope, $ws) {
     var _data = { };
 
     $ws.registerGlobal('commander_data', function(packet) {
         _data = _.extend(_data, packet.data);
+        $rootScope.$broadcast('emfd.commander-data', packet);
     });
 
     var update = function(field, value) {
