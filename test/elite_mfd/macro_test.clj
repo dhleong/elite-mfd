@@ -2,10 +2,14 @@
   (:require [clojure.test :refer :all]
             [elite-mfd.macro :refer :all]))
 
+(def vk-s 83)
+
 (deftest vk-and-bindings
   (testing "vk"
-    (is (= 40 (vk "down"))))
+    (is (= vk-s (vk "s")))
+    (is (= vk-s (vk "s ")))) ; handle extra spaces
   (testing "binding-to-vk"
     ;; TODO make sure custom bindings don't mess this up
-    (is (= 40 (binding-to-vk :ui-down)))
-    (is (= 40 (binding-to-vk "ui-down")))))
+    (is (= vk-s (binding-to-vk :ui-down)))
+    (is (= vk-s (binding-to-vk "ui-down"))))
+    (is (= vk-s (binding-to-vk "ui-down ")))) ; handle extra spaces

@@ -12,12 +12,14 @@
              (catch AWTException e)))
 ;; hand-tuned. If it works in my VM, it should work for everyone
 (def tap-delay 80)
-;; this is enough for a default "request docking" macro
+;; this is enough for the default "request docking" macro
 (def default-cmdr-bindings {:navigation "1"
                             :tab-left "q"
                             :tab-right "e"
-                            :ui-down "down"
-                            :ui-right "right"
+                            :ui-left "a"
+                            :ui-up "w"
+                            :ui-right "d"
+                            :ui-down "s"
                             :ui-select "space"})
 (def default-cmdr-macros [{:name "Request Docking"
                            :value [:navigation :tab-right :tab-right
@@ -42,16 +44,19 @@
   "Given a string name like 'down', returns the
     value of its KeyEvent/VK_* constant"
   [keyName]
-  (let [vk-name (str "VK_" (.toUpperCase keyName))]
+  (let [vk-name (str "VK_" (-> keyName .trim .toUpperCase))]
     (-> java.awt.event.KeyEvent 
         (.getField vk-name)
         (.get nil))))
 
 (defn binding-to-vk
-  [bind]
-  (if-let [raw-key (get (cmdr-bindings) (keyword bind))]
-    (vk raw-key)
-    (throw (IllegalArgumentException. (str "No such binding:" bind)))))
+  [raw-binding]
+  (let [bind (if (string? raw-binding)
+               (.trim raw-binding)
+               raw-binding)]
+    (if-let [raw-key (get (cmdr-bindings) (keyword bind))]
+      (vk raw-key)
+      (throw (IllegalArgumentException. (str "No such binding:" bind))))))
 
 (defmacro with-held 
   "Perform some actions while the provided keyCodes 
