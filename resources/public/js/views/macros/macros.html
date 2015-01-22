@@ -1,5 +1,5 @@
 <div class="scrollable">
-    <ui-state id='activeTab' default='1'></ui-state>
+    <ui-state id='activeTab' default='2'></ui-state>
 
     <div class="scrollable-header">
         <div class="list-group-item">
@@ -33,25 +33,50 @@
         </div>
 
         <!-- macros -->
-        <div class="list-group" ui-if="activeTab == 2">
-            <div class="list-group-item" ng-repeat="m in macros">
-                <div class="form-group">
-                    <input type="text" class="form-control" ng-model="macros[$index].name" />
-                    <input type="text" class="text form-control" ng-model="macros[$index].value" />
-                </div>
-            </div>
-        </div>
-
-        <div class="list-group" ui-if="activeTab == 2">
+        <div class="list-group" ui-if="activeTab == 2" ng-repeat="m in macros track by $index">
             <div class="list-group-item">
-                <div class="form-group">
-                    <input type="text" class="form-control" ng-model="newMacro.name" placeholder="New Macro Name"/>
-                    <input type="text" class="text form-control" ng-model="newMacro.value" placeholder="New Macro Value" />
+                <div class="pull-right" ng-if="!m.isNew">
+                    <button class="close" ng-click="deleteMacro($index)">
+                        <i class="fa fa-trash"></i>
+                    </button>
                 </div>
 
-                <button class="btn btn-primary btn-block">Save</button>
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <input type="text" class="form-control" ng-model="macros[$index].name" placeholder="{{ m.isNew ? 'New Macro Name' : 'Macro Name' }}"/>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-xs-6" ng-repeat="mval in m.value track by $index">
+                        <select class="form-control" ng-options="k as k for (k, v) in bindings" ng-model="m.value[$index]" ng-change="checkMacroItem(m, $index)">
+                            <option value="">-- REMOVE --</option>
+                        </select>
+                    </div>
+
+                    <div class="col-xs-6 control-label">
+                        <button class="btn btn-default center-block" ng-click="addBinding(m)">Add</button>
+                    </div>
+                </div>
+
             </div>
+
+            <div class="list-group-item" ng-if="m.isNew" ng-show="m.isNew && m.name && m.value.length">
+                <button class="btn btn-primary btn-block" ng-click="createMacro(m)">Create Macro</button>
+            </div>
+                
         </div>
+
+        <!-- <div class="list&#45;group" ui&#45;if="activeTab == 2"> -->
+        <!--     <div class="list&#45;group&#45;item"> -->
+        <!--         <div class="form&#45;group"> -->
+        <!--             <input type="text" class="form&#45;control" ng&#45;model="newMacro.name" placeholder="New Macro Name"/> -->
+        <!--             <input type="text" class="text form&#45;control" ng&#45;model="newMacro.value" placeholder="New Macro Value" /> -->
+        <!--         </div> -->
+        <!--  -->
+        <!--         <button class="btn btn&#45;primary btn&#45;block">Save</button> -->
+        <!--     </div> -->
+        <!-- </div> -->
     </div>
 </div>
 
