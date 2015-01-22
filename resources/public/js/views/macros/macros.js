@@ -1,23 +1,6 @@
 'use strict';
-/* global angular, _ */
+/* global angular */
 /* jshint indent: false */
-
-var REQUEST_DOCKING = {
-    name: "Request Docking", 
-    value: ["navigation", "tab-right", "tab-right",
-            "ui-select", "ui-down", "ui-select",
-            "tab-left", "tab-left", "navigation"]
-};
-
-// would be nice to pull this from the server somehow...
-var DEFAULT_BINDINGS = {
-    "navigation": "1",
-    "tab-left": "q",
-    "tab-right": "e",
-    "ui-down": "down",
-    "ui-right": "right",
-    "ui-select": "space"
-}
 
 angular.module('emfd.views.macros', ['ngRoute'])
 
@@ -32,30 +15,28 @@ angular.module('emfd.views.macros', ['ngRoute'])
         '$scope', 'commander',
         function($scope, cmdr) {
     var bindings = cmdr.prop('bindings', {});
-    if (!Object.keys(bindings()).length) {
-        // passing DEFAULT_BINDINGS above
-        //  doesn't seem to work....?
-        bindings(DEFAULT_BINDINGS);
-    }
+    var macros = cmdr.prop('macros', []);
     $scope.bindings = bindings();
+    $scope.macros = macros();
+    $scope.newMacro = {};
+    console.log($scope.macros);
 
-    $scope.doSave = function() {
+    $scope.saveBindings = function() {
         bindings($scope.bindings);
+    }
+
+    $scope.saveMacro = function() {
+        console.log($scope.macros);
+        console.log("NEW", $scope.newMacro);
     }
 }])
 
 .controller('MacrosBarController', [
         '$scope', 'websocket', 'commander',
-        function($scope, websocket, commander) {
+        function($scope, websocket, cmdr) {
 
-    $scope.macros = {
-        get list() {
-            var base = commander.prop('macros', [])();
-            var actual = _.toArray(base);
-            actual.unshift(REQUEST_DOCKING);
-            return actual;
-        }
-    }
+    // it's kinda BS that we can't use the getterSetter here...
+    $scope.macros = cmdr.prop('macros', [])();
 
     $scope.sendMacro = function(item) {
         websocket.send({

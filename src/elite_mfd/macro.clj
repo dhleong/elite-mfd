@@ -23,6 +23,10 @@
                             :ui-down "down"
                             :ui-right "right"
                             :ui-select "space"})
+(def default-cmdr-macros [{:name "Request Docking"
+                           :value [:navigation :tab-right :tab-right
+                                   :ui-select :ui-down :ui-select
+                                   :tab-left :tab-left :navigation]}])
 
 (defn- cmdr-bindings []
   (if-let [existing (cmdr/get-field :bindings)]
@@ -98,5 +102,12 @@
 (defn register-handlers
   "Interface used by server for registering websocket packet handlers"
   [handlers]
+  ; while we're here, ensure some default cmdr data is setup
+  (let [bindings (cmdr/get-field :bindings)
+        macros (cmdr/get-field :macros)]
+    (when (empty? bindings)
+      (cmdr/set-field :bindings default-cmdr-bindings))
+    (when (empty? macros)
+      (cmdr/set-field :macros default-cmdr-macros)))
   (assoc handlers
          :macro on-macro))

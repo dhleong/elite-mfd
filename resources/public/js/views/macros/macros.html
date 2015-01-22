@@ -1,9 +1,22 @@
 <div class="scrollable">
+    <ui-state id='activeTab' default='1'></ui-state>
+
+    <div class="scrollable-header">
+        <div class="list-group-item">
+            <div class="btn-group justified nav-tabs">
+                <a ui-set="{'activeTab': 1}" 
+                        ui-class="{'active': activeTab == 1}" class="btn btn-default">Bindings</a>
+                <a ui-set="{'activeTab': 2}" 
+                        ui-class="{'active': activeTab == 2}" class="btn btn-default">Macros</a>
+            </div>  
+        </div>
+    </div>
+
     <div class="scrollable-content">
         <!-- bindings -->
-        <div class="list-group">
+        <div class="list-group" ui-if="activeTab == 1">
             <div class="list-group-item">
-                <form role="form" class="form-horizontal" ng-submit="doSave()">
+                <form role="form" class="form-horizontal" ng-submit="saveBindings()" ng-model-options="{getterSetter: true}">
                     <legend>Bindings</legend>
                     <div class="form-group">
                         <div ng-repeat="(bind, keyName) in bindings">
@@ -20,8 +33,24 @@
         </div>
 
         <!-- macros -->
-        <div class="list-group">
-            <!-- <a class="list&#45;group&#45;item macro" href="" ng&#45;repeat="m in macros.list">{{ m.name }}</a> -->
+        <div class="list-group" ui-if="activeTab == 2">
+            <div class="list-group-item" ng-repeat="m in macros">
+                <div class="form-group">
+                    <input type="text" class="form-control" ng-model="macros[$index].name" />
+                    <input type="text" class="text form-control" ng-model="macros[$index].value" />
+                </div>
+            </div>
+        </div>
+
+        <div class="list-group" ui-if="activeTab == 2">
+            <div class="list-group-item">
+                <div class="form-group">
+                    <input type="text" class="form-control" ng-model="newMacro.name" placeholder="New Macro Name"/>
+                    <input type="text" class="text form-control" ng-model="newMacro.value" placeholder="New Macro Value" />
+                </div>
+
+                <button class="btn btn-primary btn-block">Save</button>
+            </div>
         </div>
     </div>
 </div>
