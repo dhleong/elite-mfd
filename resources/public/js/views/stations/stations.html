@@ -37,10 +37,10 @@
                     <div ng-if="commodity">
                         <!-- this looks weird, but it's true -->
                         <div ng-if="searchType == 'selling'">
-                            Sells <i>{{ data.selectedCommodity.name }}</i> at <b>{{ search.Buy }}</b>
+                            Sells <i>{{ commodity }}</i> at <b>{{ search.Buy }}</b>
                         </div>
                         <div ng-if="searchType == 'buying'">
-                            Buys <i>{{ data.selectedCommodity.name }}</i> at <b>{{ search.Sell }}</b>
+                            Buys <i>{{ commodity }}</i> at <b>{{ search.Sell }}</b>
                         </div>
                     </div>
                 </div>
@@ -59,7 +59,7 @@
         </div>
 
         <div class="list-group" ng-if="!returnTrades">
-            <a class="list-group-item" href="#/trading/{{ system }}/{{ station }}?to={{ sName }} ({{ currentSystem.system }})" ng-repeat="sName in currentSystem.stations">Find Return Trades to {{ sName }}</a>
+            <a class="list-group-item" href="#/trading/{{ currentSystem.system }}/{{ sName }}?to={{ station }} ({{ system }})" ng-repeat="sName in currentSystem.stations">Find trades from {{ sName }}</a>
         </div>
     </div>
 </div>
