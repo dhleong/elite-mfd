@@ -97,8 +97,8 @@ var autoDirectiveFactory = function(requestType, responseType, formatter) {
 
 angular.module('emfd')
 
-.controller('CoreController', ['$rootScope', 'commander', 'websocket',
-        function($rootScope, commander, websocket) {
+.controller('CoreController', ['$rootScope', 'SharedState', 'commander', 'websocket',
+        function($rootScope, Ui, commander, websocket) {
 
     // NB we don't actually need the commander service here,
     //  but we'll inject it so it gets initialized in time
@@ -122,6 +122,8 @@ angular.module('emfd')
     websocket.registerStatus('close', function() {
         $rootScope.$apply(function() {
             $rootScope.connected = false;
+
+            Ui.turnOff('uiSidebarLeft');
         });
     });
 
