@@ -70,13 +70,13 @@
   `(do 
      ;; press them all
      ~(concat 
-        '(doto robot) 
+        '(doto elite-mfd.macro/robot) 
         (map #(identity `(.keyPress ~%)) keyCodes))
      ;; work yo' body
      ~(cons 'do body)
      ;; release them all
      ~(concat 
-        '(doto robot) 
+        '(doto elite-mfd.macro/robot) 
         (map #(identity `(.keyRelease ~%)) keyCodes))))
 
 (defn evaluate-macro
