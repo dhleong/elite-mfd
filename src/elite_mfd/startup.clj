@@ -126,10 +126,11 @@
   (key-tap (binding-to-vk :ui-up))
   (key-tap (binding-to-vk :ui-select))
   ;; confirm
+  (Thread/sleep launcher-wait-sleep)
   (key-tap (binding-to-vk :ui-right))
   (key-tap (binding-to-vk :ui-select))
-  ;; give it time to exit cleanly
-  (Thread/sleep launcher-wait-sleep)
+  ;; give it plenty of time to exit cleanly
+  (Thread/sleep (* 2 launcher-wait-sleep))
   ;; make sure it's dead (rarely exits cleanly for me)
   (client-kill))
 

@@ -17,6 +17,7 @@ angular.module('emfd.views.macros', ['ngRoute'])
     var bindings = cmdr.prop('bindings', {});
     var macros = cmdr.prop('macros', []);
 
+    $scope.clientRunning = false;
     $scope.bindings = bindings();
     $scope.macros = _.toArray(macros()); // copy
 

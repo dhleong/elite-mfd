@@ -1,6 +1,18 @@
 <div class="scrollable" ng-controller="MacrosBarController">
     <h1 class="scrollable-header app-name">Quick Controls</h1>  
     <div class="scrollable-content">
+        <div class="list-group" ng-controller="StartupController">
+            <a class="list-group-item" href=""
+                    ng-click="sendStartup()"
+                    ng-hide="isClientRunning">Start Elite</a>
+            <a class="list-group-item" href=""
+                    ng-click="sendMenu()"
+                    ng-show="isClientRunning">Open Game Menu</a>
+            <a class="list-group-item" href=""
+                    ng-click="sendShutdown()"
+                    ng-show="isClientRunning">Save and Quit</a>
+        </div>
+
         <div class="list-group">
             <a class="list-group-item macro" href=""
                     ng-repeat="m in macros"
