@@ -7,9 +7,10 @@
              [commander :as commander]
              [core-api :as api]
              [macro :as macro]
-             [trading :as trading]
              [navigate :as navigate]  
-             [narrate :as narrate]])
+             [narrate :as narrate]
+             [startup :as startup]
+             [trading :as trading]])
   (:use org.httpkit.server))
 
 (defn add-client
@@ -46,8 +47,9 @@
     ;; if we know the system, tell them
     (if-let [system (:system @server)]
       (notify-system channel system))
-    ;; give them known commander values
+    ;; give them known commander values, etc.
     (commander/on-connect channel)
+    (startup/on-connect channel)
     ;; pass incoming packets to registered handlers
     (on-receive channel 
                 (fn [data]
@@ -67,7 +69,8 @@
                      macro/register-handlers
                      trading/register-handlers
                      navigate/register-handlers  
-                     narrate/register-handlers)]
+                     narrate/register-handlers
+                     startup/register-handlers)]
     (run-server (partial client-handler server handlers) {:port port})
     (println "Websockets listening on" port)
     server))

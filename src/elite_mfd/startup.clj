@@ -6,7 +6,7 @@
             [elite-mfd
              [commander :as cmdr]
              [macro :refer [with-held vk binding-to-vk key-tap]]
-             [util :refer [log]]])
+             [util :refer [log to-client]]])
   (:import [java.lang Runtime]))
 
 ;;
@@ -132,3 +132,27 @@
   (Thread/sleep launcher-wait-sleep)
   ;; make sure it's dead (rarely exits cleanly for me)
   (client-kill))
+
+;;
+;; Handlers
+;;
+(defn on-connect
+  [ch]
+  ; let them know if we're running or not
+  (to-client ch {:type :startup-data
+                 :client-running (client-running)}))
+
+(defn on-startup [_ packet] (start-elite))
+(defn on-shutdown [_ packet] (save-and-quit))
+(defn on-open-menu [_ packet] (open-menu))
+
+;;
+;; Registration
+;;
+(defn register-handlers
+  "Interface used by server for registering websocket packet handlers"
+  [handlers]
+  (assoc handlers
+         :open-menu on-open-menu
+         :startup on-startup
+         :shutdown on-shutdown))
