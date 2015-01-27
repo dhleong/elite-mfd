@@ -31,13 +31,14 @@ angular.module('emfd.views.stations', ['ngRoute'])
         $scope.trade = JSON.parse($routeParams.trade);
         $scope.subtitle = "Selected Trade";
 
-        $scope.distance = $scope.trade.Distance;
-        $scope.distanceFromJumpIn = $scope.trade.DistanceFromJumpIn;
+        $scope.distance = $scope.trade.distance;
+        $scope.distanceFromJumpIn = $scope.trade.destDistanceFromJumpIn;
 
         var form = JSON.parse($routeParams.form);
         form['station-name-end'] = form['station-name'];
         form['station-name'] = $scope.station + ' (' + $scope.system + ')';
         form['min-profit'] /= 10;
+        console.log(form);
         websocket.send(form);
         break;
 

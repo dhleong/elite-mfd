@@ -35,7 +35,14 @@
     (is (not (nil? (station-id "Aristotle Gateway"))))
     ;; return the right one if we include system
     (is (= 1397 (station-id "Aristotle Gateway (Yakabugai)")))  
-    (is (= 1279 (station-id "Aristotle Gateway (Ross 780)")))))
+    (is (= 1279 (station-id "Aristotle Gateway (Ross 780)"))))
+  (testing "system-name works"
+    (is (station-by-id 1397)) 
+    (is (= "Aristotle Gateway" (-> (station-by-id 1397) :Station))))
+  (testing "system-name works"
+    (is (= "" (system-name nil)))
+    (is (= "" (system-name "Aaronson Landing")))
+    (is (= "Yakabugai" (system-name "Aristotle Gateway (Yakabugai)")))))
 
 (deftest systems-filter
   (testing "case insenstive"

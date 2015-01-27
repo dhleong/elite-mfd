@@ -8,16 +8,19 @@
 ;;
 ;; Constants
 ;;
+;; (def dummy-calculation-result
+;;   "{\"StationRoutes\":
+;;   [{\"StartingStationId\":1046,\"StartingStationName\":\"Ackerman Market\",
+;;   \"StartingSystemName\":\"Eravate\",\"DestinationStationId\":5792,
+;;   \"DestinationStationName\":\"Ray Dock\",\"DestinationSystemName\":\"Eta Serpentis\",
+;;   \"Distance\":18.01,
+;;   \"CommodityId\":14,\"CommodityName\":\"Animal Meat\",\"Buy\":1054,\"Sell\":1580,
+;;   \"GalacticAveragePrice\":1454,\"Profit\":526,\"Qty\":4,\"Total\":2104,
+;;   \"LastUpdate\":\"1h 45m ago\",\"UpdatedBy\":\"kbclint\",
+;;   \"DistanceFromJumpIn\":662.0}]}")
+
 (def dummy-calculation-result
-  "{\"StationRoutes\":
-  [{\"StartingStationId\":1046,\"StartingStationName\":\"Ackerman Market\",
-  \"StartingSystemName\":\"Eravate\",\"DestinationStationId\":5792,
-  \"DestinationStationName\":\"Ray Dock\",\"DestinationSystemName\":\"Eta Serpentis\",
-  \"Distance\":18.01,
-  \"CommodityId\":14,\"CommodityName\":\"Animal Meat\",\"Buy\":1054,\"Sell\":1580,
-  \"GalacticAveragePrice\":1454,\"Profit\":526,\"Qty\":4,\"Total\":2104,
-  \"LastUpdate\":\"1h 45m ago\",\"UpdatedBy\":\"kbclint\",
-  \"DistanceFromJumpIn\":662.0}]}")
+ "{\"Results\":[{\"CommodityName\":\"Tea\",\"Buy\":1350,\"Sell\":1839,\"GalacticAveragePrice\":1640,\"SellLastUpdate\":\"2d 5h 19m ago\",\"SellUpdatedBy\":\"NinjaCatFail\",\"BuyLastUpdate\":\"10h 11m ago\",\"BuyUpdatedBy\":\"Sangrias\",\"Profit\":489,\"Source\":\"Zeessze (Nicollier Hanger)\",\"SourceSystemName\":\"Zeessze\",\"SourceStationId\":2526,\"SourceSystemId\":51576,\"SourceStationDistance\":489.0,\"Destination\":\"Iota Persei (Walker City)\",\"DestinationSystemName\":\"Iota Persei\",\"DestinationStationId\":2068,\"DestinationSystemId\":42198,\"DestinationStationDistance\":459.0,\"Distance\":13.72,\"Qty\":36,\"TotalProfit\":17604,\"SourcePermitRequired\":false,\"DestinationPermitRequired\":false}]}")
 
 (def basic-calculate-packet
   {:type "on-calculate"
@@ -100,9 +103,11 @@
     (with-fake-http [#".*" dummy-calculation-result]
       (do-test calculate-trades
         (fn [result]
-          (is (vector? result))
+          (is (coll? result))
           (is (not (empty? result)))
-          (is (= 2104 (-> result first :Total)))))))
+          (is (= "Iota Persei" (-> result first :destSystem)))    
+          (is (= "Walker City" (-> result first :destStation)))    
+          (is (= 17604 (-> result first :totalProfit)))))))
   (testing "Request Error"
     (with-fake-http [#".*" 400] ; server didn't like it
       (do-test calculate-trades
@@ -129,10 +134,10 @@
           (is (= 1 (count (-> sent
                               first
                               :result))))
-          (is (= 2104 (-> sent 
+          (is (= 17604 (-> sent 
                           first ; the packet
                           :result
-                          first :Total))))))))
+                          first :totalProfit))))))))
 
 (deftest test-search
   (testing "Simple request"
@@ -140,7 +145,7 @@
     (with-fake-http [#".*" dummy-search-result]
       (do-test search-stations
         (fn [result]
-          (is (vector? result))
+          (is (coll? result))
           (is (not (empty? result)))
           (is (= "Eravate" (-> result first :SystemName)))))))
   (testing "Request Error"

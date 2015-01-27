@@ -30,7 +30,7 @@ angular.module('emfd.views.trading', ['ngRoute'])
     };
 
     $scope.validSizes = cmdr.VALID_PAD_SIZES;
-    $scope.validRanges = ['15', '25', '50'];
+    $scope.validRanges = ['15', '25', '50', '75'];
 
     if (dataStore.trading 
             && dataStore.tradingForm['station-name'] == $scope.form['station-name']) {
@@ -50,8 +50,12 @@ angular.module('emfd.views.trading', ['ngRoute'])
         }
     });
 
+    $scope.prepForm = function() {
+        return cmdr.form($scope.form);
+    }
+
     $scope.onCalculate = function() {
-        var packet = cmdr.form($scope.form);
+        var packet = $scope.prepForm();
         console.log('>>', packet);
         dataStore.tradingForm = $scope.form;
         websocket.send(packet);

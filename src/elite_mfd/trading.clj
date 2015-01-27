@@ -4,7 +4,8 @@
   (:require [cheshire.core :refer [generate-string parse-string]]
             [org.httpkit.client :as http]
             [elite-mfd.util :refer [log to-client client-error]]  
-            [elite-mfd.core-api :refer [get-stations station-id]]))
+            [elite-mfd.core-api :refer [get-stations station-id 
+                                        station-by-id system-name]]))
 
 ;;
 ;; Constants
@@ -46,6 +47,36 @@
     "1"
     arg))
 
+(defn extract-calculate-results
+  [raw-json]
+  (when-let [results (:Results raw-json)]
+    (map 
+      ;; This is a little gross, but lets us ensure a consistent API across
+      ;;  different sources or changes in a chosen source. There may be a
+      ;;  way to make this fancier....
+      ;; We *should* abstract this stuff for all API calls....
+      (fn [result]
+        {:buy (-> result :Buy)
+         :buyLastUpdate (-> result :BuyLastUpdate)
+         :commodityName (-> result :CommodityName)
+         :destSystem (-> result :DestinationSystemName)
+         :destStation (-> result
+                          :DestinationStationId 
+                          station-by-id
+                          :Station)
+         :destDistanceFromJumpIn (-> result :DestinationStationDistance)
+         :distance (-> result :Distance)
+         :qty (-> result :Qty)
+         :sell (-> result :Sell)
+         :sellLastUpdate (-> result :SellLastUpdate)
+         :startingStation (-> result
+                              :SourceStationId
+                              station-by-id
+                              :Station)
+         :startingSystem (-> result :SourceSystemName)
+         :totalProfit (-> result :TotalProfit)})
+      results)))
+
 ;;
 ;; API calls
 ;;
@@ -68,11 +99,13 @@
          search-range "15"}}]
   (let [request-body {:Cargo cargo
                       :Cash cash
+                      :EndSystem (system-name station-name-end)
                       :EndStationId (station-id station-name-end)
                       :MaxDistanceFromJumpIn max-distance
                       :MinProfit min-profit
                       :PadSize pad-size
                       :SearchRange search-range
+                      :StartSystem (system-name station-name-start)
                       :StartStationId (station-id station-name-start)}]
     (log request-body)
     (http/post 
@@ -85,9 +118,9 @@
           (do 
             (log "! Error calculating:" error "Request:" request-body)
             (callback nil))
-          ; TODO parse results to a friendly format so any changes
+          ; parse results to a friendly format so any changes
           ;  to the service's format are transparent to clients
-          (callback (:StationRoutes (parse-string body true))))))))
+          (callback (extract-calculate-results (parse-string body true))))))))
 
 (defn search-stations
   "Call the station searcher with various filters"

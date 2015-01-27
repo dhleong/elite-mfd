@@ -21,9 +21,9 @@
                 <legend class="station-subtitle" ng-if="subtitle">{{ subtitle }}</legend>
 
                 <div ng-if="ref == 'trading'">
-                    From <span class="station">{{ trade.StartingStationName }}</span> 
-                    Buy {{ trade.Qty }} {{ trade.CommodityName }} @ {{ trade.Buy }}<br>
-                    And sell them here for total profit: {{ trade.Total }}
+                    From <span class="station">{{ trade.startingStation }}</span> 
+                    Buy {{ trade.qty }} {{ trade.commodityName }} @ {{ trade.buy }}<br>
+                    And sell them here for total profit: {{ trade.totalProfit }}
                 </div>
 
                 <div ng-if="ref == 'search'">
@@ -50,8 +50,8 @@
 
         <div class="list-group" ng-if="returnTrades">
             <div class="list-group-item" ng-repeat="trade in returnTrades">
-                Buy {{ trade.Qty }} {{ trade.CommodityName }} @ {{ trade.Buy }}<br>
-                And return to {{ trade.DestinationStationName }} for profit: {{ trade.Total }}
+                Buy {{ trade.qty }} {{ trade.commodityName }} @ {{ trade.buy }}<br>
+                And return to {{ trade.destStation }} for profit: {{ trade.totalProfit }}
             </div>
             <div class="list-group-item" ng-if="!returnTrades.length">
                 No profitable return trades

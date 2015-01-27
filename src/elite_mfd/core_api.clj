@@ -56,6 +56,14 @@
     cached 
     [])) ; network issue? be graceful 
 
+(defn station-by-id
+  "Returns the station dict by its given id"
+  [id]
+  ; NB if performance becomes a problem, we can certainly cache this as well...
+  (first (filter 
+           #(= id (:StationId %))
+           (get-stations))))
+
 (defn station-id
   "Returns the id of a station from its name"
   [station-name]
@@ -72,6 +80,18 @@
           first
           :StationId
           ))))
+
+(defn system-name
+  "Returns the name of a system given `Station (System)` input"
+  [station-name]
+  ; NB if performance becomes a problem, we can certainly cache this as well...
+  (if (nil? station-name)
+    "" ; quick shortcut
+    (if-let [[_ station system] (re-find #"(.*) \((.*)\)" station-name)]
+      ;; system included
+      system
+      ;; just station... use empty string
+      "")))
 
 (defn filter-systems
   "Given input, find matching system names"

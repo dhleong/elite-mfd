@@ -70,19 +70,19 @@
         <div ng-show="results != null" class="list-group">
             <!-- tap trade to calculate route? -->
             <div ng-hide="results.length" class="list-group-item">No trades found</div>
-            <a ng-repeat="trade in results" class="list-group-item" href="#/stations/{{ trade.DestinationSystemName }}/{{ trade.DestinationStationName }}/trading?trade={{ trade }}&form={{ form }}">
+            <a ng-repeat="trade in results" class="list-group-item" href="#/stations/{{ trade.destSystem }}/{{ trade.destStation }}/trading?trade={{ trade }}&form={{ prepForm() }}">
                 <div class="commodity">
-                    Buy ({{ trade.Qty }}) {{ trade.CommodityName }} @ {{ trade.Buy }}
+                    Buy ({{ trade.qty }}) {{ trade.commodityName }} @ {{ trade.buy }}
                 </div>
                 <div class="destination">
-                    Sell at: <span class="station">{{ trade.DestinationStationName }}</span> ({{ trade.DistanceFromJumpIn }} Ls)<br />
-                    &nbsp;&nbsp;&nbsp;&nbsp;in <span class="system">{{ trade.DestinationSystemName }}</span>
-                    ({{ trade.Distance }}&nbsp;Ly)
+                    Sell at: <span class="station">{{ trade.destStation }}</span> ({{ trade.destDistanceFromJumpIn }} Ls)<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;in <span class="system">{{ trade.destSystem }}</span>
+                    ({{ trade.distance }}&nbsp;Ly)
                     <div class="profit">
-                        For total profit: {{ trade.Total }}
+                        For total profit: {{ trade.totalProfit }}
                     </div>
                     <div class="update">
-                        Last Updated: {{ trade.LastUpdate }}
+                        Last Updated: {{ trade.sellLastUpdate }}
                     </div>
                 </div>
             </a>
