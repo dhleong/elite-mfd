@@ -27,6 +27,10 @@ a.macro {
     padding: 1.5em;
 }
 
+.keyboard-container {
+    padding: 1em;
+}
+
 .app-content-loading {
   text-align: center;
   height: 100%;

@@ -34,11 +34,7 @@
                             <ui-switch ng-model="useTurnByTurn"></ui-switch>
                         </div>
                     </div>
-                    <button class="btn btn-primary btn-block">Navigate</button>
-
-                    <div ui-content-for="navbutton-action">
-                        <a class='btn' ng-click='onSearch()'>Navigate</a>
-                    </div>
+                    <button class="btn btn-primary btn-block" ng-disabled="!(form.end.length && form.start.length)">Navigate</button>
                 </form>
             </div>
         </div>

@@ -1,0 +1,25 @@
+<div ng-controller="KeyboardController">
+    <div class="scrollable">
+        <div class="scrollable-header">
+            <div class="list-group">
+            </div>
+        </div>
+        <div class="scrollable-content">
+            <div class="list-group">
+                <a class="list-group-item" 
+                        href=""
+                        ng-repeat="s in keyboard.suggestions"
+                        ng-click="sendKeys(s)">
+                    {{ s }}
+                </a>
+            </div>
+        </div>
+        <div class="scrollable-footer">
+            <div class="keyboard-container">
+                <form role="form" ng-submit="sendKeys(input)">
+                    <input type="text" class="form-control" ng-model="input" placeholder="Text input..." autofocus />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -18,6 +18,10 @@
                 class="sidebar sidebar-left">
         </div>
 
+        <div ng-include="'js/views/keyboard/keyboard.html'" 
+                class="sidebar sidebar-right">
+        </div>
+
         <div class="app"
                 ng-swipe-right='Ui.turnOn("uiSidebarLeft")'
                 ng-swipe-left='Ui.turnOff("uiSidebarLeft")'>
@@ -35,7 +39,11 @@
                 </div>
 
                 <div class="btn-group pull-right" ng-class="{'hidden': !connected}">
-                    <div class="btn btn-navbar" ui-yield-to="navbutton-action"></div>
+                    <div class="btn btn-navbar" ui-yield-to="navbutton-action">
+                        <div ui-toggle="uiSidebarRight" class="btn sidebar-toggle">
+                            <i class="fa fa-keyboard-o"></i>&nbsp;Keys
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -72,6 +80,7 @@
         <script src="js/core.js" type="text/javascript" charset="utf-8"></script>
         <script src="js/startup.js" type="text/javascript" charset="utf-8"></script>
         <script src="js/views/home/home.js" type="text/javascript" charset="utf-8"></script>
+        <script src="js/views/keyboard/keyboard.js" type="text/javascript" charset="utf-8"></script>
         <script src="js/views/macros/macros.js" type="text/javascript" charset="utf-8"></script>
         <script src="js/views/stations/stations.js" type="text/javascript" charset="utf-8"></script>
         <script src="js/views/trading/trading.js" type="text/javascript" charset="utf-8"></script>
