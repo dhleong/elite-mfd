@@ -31,20 +31,28 @@
     existing
     default-cmdr-bindings))
 
-(defn key-tap
-  "Quickly tap the keyCode"
+(defmulti key-tap
+  "Quickly tap the keyCode or sequence of keyCodes"
+  #(if (coll? %) 
+     :collection
+     :code))
+(defmethod key-tap :code
   [keyCode]
   (doto robot
     (.keyPress keyCode)
     (.delay tap-delay)
     (.keyRelease keyCode)
     (.delay tap-delay)))
+(defmethod key-tap :collection
+  [keyCodes]
+  (doseq [code keyCodes]
+    (key-tap code)))
 
 (defn vk
   "Given a string name like 'down', returns the
     value of its KeyEvent/VK_* constant"
   [keyName]
-  (let [vk-name (str "VK_" (-> keyName .trim .toUpperCase))]
+  (let [vk-name (str "VK_" (-> keyName str .trim .toUpperCase))]
     (-> java.awt.event.KeyEvent 
         (.getField vk-name)
         (.get nil))))
@@ -53,10 +61,20 @@
   [raw-binding]
   (let [bind (if (string? raw-binding)
                (.trim raw-binding)
-               raw-binding)]
-    (if-let [raw-key (get (cmdr-bindings) (keyword bind))]
-      (vk raw-key)
-      (throw (IllegalArgumentException. (str "No such binding:" bind))))))
+               raw-binding)
+        raw-key (get (cmdr-bindings) (keyword bind))]
+    (cond 
+      ;; is it a normal binding?
+      (not (nil? raw-key)) (vk raw-key)
+      ;; is it a quoted string?
+      (-> bind (.startsWith "\"")) 
+      (->> bind
+           seq ; turn the string into a seq...
+           rest ; so we can drop the first...
+           drop-last ; ... and last quotes
+           (map vk)) ; and get their vks
+      ;; no idea.
+      :else (throw (IllegalArgumentException. (str "No such binding:" bind))))))
 
 (defmacro with-held 
   "Perform some actions while the provided keyCodes 

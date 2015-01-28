@@ -11,5 +11,8 @@
   (testing "binding-to-vk"
     ;; TODO make sure custom bindings don't mess this up
     (is (= vk-s (binding-to-vk :ui-down)))
-    (is (= vk-s (binding-to-vk "ui-down"))))
-    (is (= vk-s (binding-to-vk "ui-down ")))) ; handle extra spaces
+    (is (= vk-s (binding-to-vk "ui-down")))
+    (is (= vk-s (binding-to-vk "ui-down "))))
+  (testing "quoted binding to vk")
+    (is (= [vk-s (vk "o") vk-s]
+           (binding-to-vk "\"sos\"")))) 
