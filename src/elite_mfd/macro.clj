@@ -30,14 +30,31 @@
 ;; TODO support more symbols, perhaps
 (def vk-special-cases {\space "VK_SPACE"
                        \- "VK_MINUS"
-                       \+ "VK_PLUS"
-                       \_ "VK_UNDERSCORE"
+                       \= "VK_EQUALS"
                        \, "VK_COMMA"
                        \. "VK_PERIOD"
-                       \! "VK_EXCLAMATION_MARK" ; FIXME this doesn't work on qwerty
                        \/ "VK_SLASH"
                        \\ "VK_BACK_SLASH"
-                       \? "VK_SLASH"}) ; since there's no QUESTION_MARK key...
+                       \' "VK_QUOTE"
+                       \; "VK_SEMICOLON"})
+;; all these symbols use the "shift" modifier on the qwery keyboard
+;; this map should look like (symbol) -> {:vk-name (key to press) :with (modifier)}
+(def qwerty-symbol-mods (apply merge
+                               (map 
+                                 (fn [[k v]] 
+                                   {k {:vk-name v :with "shift"}})
+                                 {\! "1"
+                                  \@ "2"
+                                  \# "3"
+                                  \$ "4"
+                                  \% "5"
+                                  \_ "minus"
+                                  \= "equals"
+                                  \? "slash"
+                                  \: "semicolon"
+                                  \" "quote"
+                                  })))
+
 
 (defn- cmdr-bindings []
   (if-let [existing (cmdr/get-field :bindings)]
@@ -116,9 +133,16 @@
       ;; numbers
       (Character/isDigit codePoint)
       (vk character)
-      ;; TODO symbols
-      ;; for everything else...
-      :else (vk character))))
+      :else 
+      ;; symbols?
+      (let [mods (cmdr/get-field :keyboard qwerty-symbol-mods)
+            symbol-info (get mods character)]
+        (if symbol-info
+          ;; symbols!
+          {:vk (vk (:vk-name symbol-info))
+           :with (vk (:with symbol-info))}
+          ;; for everything else, there's vk...
+          (vk character))))))
 
 (defn binding-to-vk
   [raw-binding]

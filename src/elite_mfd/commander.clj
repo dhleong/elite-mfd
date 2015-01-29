@@ -35,7 +35,7 @@
   {:pre [(keyword? field)
          (not (nil? cmdr))]}
   (if default
-    (get @cmdr field default)
+    (get @cmdr field (first default))
     (get @cmdr field)))
 
 (defn set-commander-field
@@ -51,7 +51,7 @@
 
 (defn get-field [field & default]
   (if default
-    (get-commander-field (ensure-data-read) field default)
+    (get-commander-field (ensure-data-read) field (first default))
     (get-commander-field (ensure-data-read) field)))
 
 (defn set-field [field value]

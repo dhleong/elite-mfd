@@ -8,6 +8,10 @@
       (is (nil? (get-commander-field cmdr :cash)))
       (set-commander-field cmdr :cash 42)
       (is (= 42 (get-commander-field cmdr :cash)))))
+  (testing "Get with default"
+    (let [cmdr (atom {})
+          default {:name "Serenity" :type "Firefly"}]
+      (is (= default (get-commander-field cmdr :now-ive-found default)))))
   (testing "Handler"
     (let [cmdr (atom {})]
       (is (nil? (get-commander-field cmdr :name)))

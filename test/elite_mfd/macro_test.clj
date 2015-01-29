@@ -20,8 +20,10 @@
   (testing "quoted binding to vk"
     (is (= [vk-s (vk "o") vk-s]
            (binding-to-vk "\"sos\"")))
-    (is (= [(vk "minus") (vk "space") (vk "underscore") (vk "plus")
-            (vk "period") (vk "comma") (vk "exclamation_mark") (vk "slash")]
-           (binding-to-vk "\"- _+.,!?\"")))
+    (is (= [(vk "minus") (vk "space") (vk "period") (vk "comma") ]
+           (binding-to-vk "\"- .,\"")))
     (is (= [{:vk vk-s :with vk-shift} vk-s]
-           (binding-to-vk "\"Ss\"")))))
+           (binding-to-vk "\"Ss\"")))
+    ;; using qwerty default
+    (is (= [{:vk (vk "1") :with vk-shift} {:vk (vk "slash") :with vk-shift}]
+           (binding-to-vk "\"!?\"")))))
