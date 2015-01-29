@@ -1,6 +1,6 @@
 'use strict';
 /* jshint indent:false */
-/* global angular */
+/* global angular, _ */
 
 var LONG_JOURNEY_SIZE = 5;
 
@@ -14,8 +14,10 @@ angular.module('emfd.views.navigate', ['ngRoute'])
 }])
 
 .controller('NavigateController', [
-        '$scope', '$routeParams', '$rootScope', 'websocket', 'commander',
-        function($scope, $routeParams, $rootScope, websocket, cmdr) {
+        '$scope', '$routeParams', '$rootScope', 
+        'websocket', 'commander', 'keyboardSuggestions',
+        function($scope, $routeParams, $rootScope, 
+            websocket, cmdr, keyboardSuggestions) {
     $scope.form = {
         type: 'navigate'
       , start: $routeParams.start
@@ -53,6 +55,11 @@ angular.module('emfd.views.navigate', ['ngRoute'])
 
     $scope.lastSystem = $rootScope.currentSystem.system;
 
+    var updateSuggestions = function(currentIndex) {
+        keyboardSuggestions.setForScope($scope, 
+            _.drop(_.pluck($scope.results, 'name'), currentIndex + 1));
+    }
+
     websocket.registerLocal($scope, {
         on_system: function(packet) {
             console.log("System updated!", packet);
@@ -89,6 +96,8 @@ angular.module('emfd.views.navigate', ['ngRoute'])
                 return;
             }
 
+            updateSuggestions(currentIndex);
+
             if ($scope.useTurnByTurn) {
                 var nextIndex = currentIndex + 1;
                 if ($scope.results.length == nextIndex) {
@@ -119,6 +128,7 @@ angular.module('emfd.views.navigate', ['ngRoute'])
                 $scope.error = packet.result.errormsg;
             } else {
                 $scope.results = packet.result || [];
+                updateSuggestions(0);
             }
 
             if ($scope.useTurnByTurn && $scope.results.length > 2) {

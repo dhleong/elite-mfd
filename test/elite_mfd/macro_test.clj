@@ -14,5 +14,8 @@
     (is (= vk-s (binding-to-vk "ui-down")))
     (is (= vk-s (binding-to-vk "ui-down "))))
   (testing "quoted binding to vk")
-    (is (= [vk-s (vk "o") vk-s]
-           (binding-to-vk "\"sos\"")))) 
+  (is (= [vk-s (vk "o") vk-s]
+         (binding-to-vk "\"sos\"")))
+  (is (= [(vk "minus") (vk "space") (vk "underscore") (vk "plus")
+          (vk "period") (vk "comma") (vk "exclamation_mark") (vk "slash")]
+         (binding-to-vk "\"- _+.,!?\""))))

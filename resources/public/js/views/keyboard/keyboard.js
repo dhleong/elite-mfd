@@ -12,10 +12,13 @@ angular.module('emfd')
 
     return {
         setForScope: function($scope, suggestions) {
+            var hadSuggestions = suggestionsMap[$scope];
             suggestionsMap[$scope] = suggestions;
-            $scope.$on('$destroy', function() {
-                delete suggestionsMap[$scope];
-            });
+            if (!hadSuggestions) {
+                $scope.$on('$destroy', function() {
+                    delete suggestionsMap[$scope];
+                });
+            }
         }
       , get suggestions() {
             return _.reduce(_.keys(suggestionsMap), function(list, scope) {
@@ -33,10 +36,12 @@ angular.module('emfd')
     $scope.input = '';
 
     $scope.sendKeys = function(input) {
+        // NB we intentionally accept empty input,
+        //  so our enter can mimic the real enter
         $scope.input = '';
         $ws.send({
             type: 'macro'
-          , macro: ['"' + input + '"']
+          , macro: ['"' + input + '"', 'ui-confirm']
         });
     }
 }]);

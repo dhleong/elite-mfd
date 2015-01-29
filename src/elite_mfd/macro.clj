@@ -12,6 +12,7 @@
              (catch AWTException e)))
 ;; hand-tuned. If it works in my VM, it should work for everyone
 (def tap-delay 80)
+(def multi-tap-delay 10)
 ;; this is enough for the default "request docking" macro
 (def default-cmdr-bindings {:navigation "1"
                             :tab-left "q"
@@ -20,11 +21,23 @@
                             :ui-up "w"
                             :ui-right "d"
                             :ui-down "s"
+                            :ui-confirm "enter" ;; eg: quick comms; shouldn't need remap
                             :ui-select "space"})
 (def default-cmdr-macros [{:name "Request Docking"
                            :value [:navigation :tab-right :tab-right
                                    :ui-select :ui-down :ui-select
                                    :tab-left :tab-left :navigation]}])
+;; TODO support more symbols, perhaps
+(def vk-special-cases {\space "VK_SPACE"
+                       \- "VK_MINUS"
+                       \+ "VK_PLUS"
+                       \_ "VK_UNDERSCORE"
+                       \, "VK_COMMA"
+                       \. "VK_PERIOD"
+                       \! "VK_EXCLAMATION_MARK"
+                       \/ "VK_SLASH"
+                       \\ "VK_BACK_SLASH"
+                       \? "VK_SLASH"}) ; since there's no QUESTION_MARK key...
 
 (defn- cmdr-bindings []
   (if-let [existing (cmdr/get-field :bindings)]
@@ -33,31 +46,40 @@
 
 (defmulti key-tap
   "Quickly tap the keyCode or sequence of keyCodes"
-  #(if (coll? %) 
-     :collection
-     :code))
+  (fn [arg & _]
+    (if (coll? arg) 
+      :collection
+      :code)))
 (defmethod key-tap :code
-  [keyCode]
+  [keyCode & {:keys [with-delay] :or {with-delay tap-delay}}]
   (doto robot
     (.keyPress keyCode)
-    (.delay tap-delay)
+    (.delay with-delay)
     (.keyRelease keyCode)
-    (.delay tap-delay)))
+    (.delay with-delay)))
 (defmethod key-tap :collection
-  [keyCodes]
+  [keyCodes & _]
   (doseq [code keyCodes]
-    (key-tap code)))
+    (key-tap code :with-delay multi-tap-delay)))
 
 (defn vk
   "Given a string name like 'down', returns the
-    value of its KeyEvent/VK_* constant"
+  value of its KeyEvent/VK_* constant"
   [keyName]
-  (let [vk-name (str "VK_" (-> keyName str .trim .toUpperCase))]
+  (let [special-case (get vk-special-cases keyName nil)
+        vk-name (some identity 
+                      [special-case
+                       (str "VK_" (-> keyName str .trim .toUpperCase))])]
     (-> java.awt.event.KeyEvent 
         (.getField vk-name)
         (.get nil))))
 
 (defn binding-to-vk
+  ;; FIXME Support correct case for quoted strings
+  ;;  What we have is an elegant solution, but case
+  ;;  is necessarily lost. We'll have to return some
+  ;;  compound data to indicate with-held options, and
+  ;;  `key-tap` will have to support that....
   [raw-binding]
   (let [bind (if (string? raw-binding)
                (.trim raw-binding)
