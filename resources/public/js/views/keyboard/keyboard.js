@@ -41,7 +41,7 @@ angular.module('emfd')
         $scope.input = '';
         $ws.send({
             type: 'macro'
-          , macro: ['"' + input + '"', 'ui-confirm']
+          , macro: ['"' + input + '"', 'press-enter']
         });
     }
 }]);

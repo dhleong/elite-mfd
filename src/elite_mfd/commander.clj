@@ -31,10 +31,12 @@
 
 (defn get-commander-field
   "Public for testing; generally you want to just use get-field"
-  [cmdr field]
+  [cmdr field & default]
   {:pre [(keyword? field)
          (not (nil? cmdr))]}
-  (get @cmdr field))
+  (if default
+    (get @cmdr field default)
+    (get @cmdr field)))
 
 (defn set-commander-field
   "Public for testing; generally you want to just use set-field"
@@ -47,8 +49,10 @@
     ; so persist the change
     (spit commander-data-file (generate-string @commander-data {:pretty true}))))
 
-(defn get-field [field]
-  (get-commander-field (ensure-data-read) field))
+(defn get-field [field & default]
+  (if default
+    (get-commander-field (ensure-data-read) field default)
+    (get-commander-field (ensure-data-read) field)))
 
 (defn set-field [field value]
   (set-commander-field (ensure-data-read) field value))
