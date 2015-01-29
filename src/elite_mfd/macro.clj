@@ -161,7 +161,11 @@
            drop-last ; ... and last quotes
            (map char-vk)) ; and get their vks
       ;; no idea.
-      :else (throw (IllegalArgumentException. (str "No such binding:" bind))))))
+      :else 
+      ;; is there a default?
+      (if-let [default (get default-cmdr-bindings (keyword bind))]
+        (vk default) ;; use the default (possibly a new binding)
+        (throw (IllegalArgumentException. (str "No such binding:" bind)))))))
 
 (defn evaluate-macro
   "Evaluate a macro as a series of binding presses"
