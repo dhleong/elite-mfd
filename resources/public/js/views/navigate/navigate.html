@@ -61,6 +61,12 @@
                 <i ng-if="$last" class="fa fa-flag-checkered"></i>
                 <span class="navigation-name">{{ r.name }}</span>
                 <span class="navigation-distance" ng-if="!$first">{{ r.distance|number:1 }} Ly</span>
+                <a href="" class="list-group-item pull-right navigation-search"
+                        ng-show="!inSystem(r.name) && canPerformNavMacro()"
+                        ng-click="performNavMacro(r.name)">
+                    <i class="fa fa-search"></i>
+                </a>
+
             </div>
         </div>
     </div>

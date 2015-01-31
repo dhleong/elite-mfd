@@ -14,8 +14,10 @@
 (def tap-delay 80)
 (def multi-tap-delay 10)
 ;; this is enough for the default "request docking" macro
-(def default-cmdr-bindings {:navigation "1"
-                            :macro-wait 850 ;; NB: ints are always ms delays
+(def default-cmdr-bindings {:backspace "back_space" ;; also shouldn't need remapping
+                            :galaxy-map nil ;; no default :(
+                            :macro-wait 1500 ;; NB: ints are always ms delays
+                            :navigation "1"
                             :press-enter "enter" ;; eg: quick comms; shouldn't need remap
                             :tab-left "q"
                             :tab-right "e"
@@ -157,7 +159,10 @@
         raw-key (get (cmdr-bindings) (keyword bind))]
     (cond 
       ;; is it a special case delay?
-      (integer? raw-key) {:delay raw-key}
+      (integer? (get default-cmdr-bindings (keyword bind)))
+      {:delay (if (integer? raw-key)
+                raw-key ;; already a number
+                (Integer/parseInt raw-key))} ;; coerce
       ;; is it a normal binding?
       (not (nil? raw-key)) (vk raw-key)
       ;; is it a quoted string?

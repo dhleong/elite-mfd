@@ -150,4 +150,20 @@ angular.module('emfd.views.navigate', ['ngRoute'])
         $scope.error = null;
         $scope.loading = true;
     }
+
+    $scope.canPerformNavMacro = function() {
+        var bindings = cmdr.get('bindings');
+        console.log(bindings);
+        return bindings && bindings['galaxy-map'];
+    }
+    $scope.performNavMacro = function(systemName) {
+        websocket.send({
+            type: 'macro'
+          , macro: ['galaxy-map', 'macro-wait', 
+                    'tab-right', 'ui-select', // select the field
+                    'backspace', // if `space` is ui-select, one is added
+                    '"' + systemName + '"', // finally type
+                    'press-enter']
+        });
+    }
 }])

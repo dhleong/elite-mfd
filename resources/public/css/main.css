@@ -17,6 +17,14 @@
     font-size: 120%;
 }
 
+.navigation-search {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: -1px; /* hide the border */
+    padding-top: 1em;
+}
+
 legend.station-subtitle {
     margin-top: 1em;
     margin-bottom: 0;

@@ -77,7 +77,12 @@ angular.module('emfd')
       , VALID_PAD_SIZES: ['Small', 'Medium', 'Large']
     };
 
-    /* Per-view fields */
+    /** straightforward getter */
+    service.get = function(name) {
+        return _data[name];
+    }
+
+    /** Per-view fields */
     service.prop = function(name, defaultValue) {
         if (!service[name]) {
             service[name] = newField(name, defaultValue);

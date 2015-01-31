@@ -15,6 +15,8 @@ The MFD also provides other convenience tools:
 
 - Macro system, with a default for requesting landing permission
 - Login and logout with the press of a button
+- Keyboard input, with contextual suggestions
+- Automated galaxy map search from Navigation
 
 ## Installation
 
@@ -37,6 +39,10 @@ For faster startup, you can build a static jar using:
 Static jars can be launched with [Launch4J](http://launch4j.sourceforge.net/) in Windows, if that's what you're into.
 
 Once the server is running, open a web browser from your preferred device pointing to the computer's IP and port `9876`, eg: if your computer has the LAN IP address `192.168.1.6`, open `http://192.168.1.6:9876`. 
+
+### Galaxy Map Search Button
+
+To make the search button in Navigation results work correctly, you must provide a binding for `galaxy-map` (it's unbound by default). You must also make sure that the buttons to flip between UI tabs is not overlapped with any of the Galaxy Map navigation buttons (they are by default).
 
 ## Credits
 
