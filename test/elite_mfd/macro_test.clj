@@ -26,4 +26,6 @@
            (binding-to-vk "\"Ss\"")))
     ;; using qwerty default
     (is (= [{:vk (vk "1") :with vk-shift} {:vk (vk "slash") :with vk-shift}]
-           (binding-to-vk "\"!?\"")))))
+           (binding-to-vk "\"!?\""))))
+  (testing "macro-wait"
+    (is (= {:delay 850} (binding-to-vk "macro-wait")))))

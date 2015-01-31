@@ -15,6 +15,7 @@
 (def multi-tap-delay 10)
 ;; this is enough for the default "request docking" macro
 (def default-cmdr-bindings {:navigation "1"
+                            :macro-wait 850 ;; NB: ints are always ms delays
                             :press-enter "enter" ;; eg: quick comms; shouldn't need remap
                             :tab-left "q"
                             :tab-right "e"
@@ -58,7 +59,7 @@
 
 (defn- cmdr-bindings []
   (if-let [existing (cmdr/get-field :bindings)]
-    existing
+    (merge default-cmdr-bindings existing)
     default-cmdr-bindings))
 
 (defmacro with-held 
@@ -103,8 +104,12 @@
     (key-tap code :with-delay multi-tap-delay)))
 (defmethod key-tap :map
   [keyDef & args]
-  (with-held [(:with keyDef)]
-    (apply key-tap (cons (:vk keyDef) args)))) 
+  (if-let [the-delay (:delay keyDef)]
+    ;; just a delay
+    (doto robot (.delay the-delay))
+    ;; combo
+    (with-held [(:with keyDef)]
+      (apply key-tap (cons (:vk keyDef) args))))) 
 
 (defn vk
   "Given a string name like 'down', returns the
@@ -151,6 +156,8 @@
                raw-binding)
         raw-key (get (cmdr-bindings) (keyword bind))]
     (cond 
+      ;; is it a special case delay?
+      (integer? raw-key) {:delay raw-key}
       ;; is it a normal binding?
       (not (nil? raw-key)) (vk raw-key)
       ;; is it a quoted string?
