@@ -1,4 +1,4 @@
-(defproject elite-mfd "1.1.0-SNAPSHOT"
+(defproject elite-mfd "1.1.1-SNAPSHOT"
   :description "Fancy, contextual Elite: Dangerous tools"
   :url "http://github.com/dhleong/elite-mfd"
   :license {:name "Eclipse Public License"

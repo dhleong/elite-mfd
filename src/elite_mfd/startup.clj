@@ -101,7 +101,8 @@
     ;; wait for login...
     (Thread/sleep launcher-wait-sleep)
     (send-shift-tab)
-    (key-tap (vk "end")) ;; select E:D
+    (key-tap (vk "home")) ;; select E:D
+    (send-shift-tab)
     (send-shift-tab)
     (key-tap (vk "space")))) ;; gogogo!
 
