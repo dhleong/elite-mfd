@@ -7,9 +7,11 @@
 (ns ^{:author "Daniel Leong"
       :doc "Config/Prep/Startup"} 
   elite-mfd.core
-  (:require [clojure.tools.nrepl.server :refer [start-server stop-server]]
+  (:require [clojure
+             [string :refer [lower-case]]
+             [zip :refer [xml-zip root edit node]]]
+            [clojure.tools.nrepl.server :refer [start-server stop-server]]
             [clojure.data.xml :refer [parse emit]]
-            [clojure.zip :refer [xml-zip root edit node]]
             [clojure.data.zip.xml :as c-d-z-xml
              :refer [xml-> xml1-> attr attr= text]]
             [clojure.java.io :refer [file reader writer]]
@@ -26,11 +28,18 @@
 ;;
 ;; Config
 ;;
+(def is-osx? (.contains (lower-case (System/getProperty "os.name")) "mac"))
 (def app-data (file (System/getProperty "user.home") "AppData"))
-(def product-root (if (.exists app-data) 
+(def app-support (file (System/getProperty "user.home") "Library" "Application Support"))
+(def product-root (cond
                     ; actual windows machine
+                    (.exists app-data) 
                     (file app-data "Local/Frontier_Developments/Products")
+                    ; actual mac machine
+                    (.exists app-support)
+                    (file app-support "Steam" "SteamApps" "Common" "Elite Dangerous" "Products")
                     ; dev environment
+                    :else
                     (file (System/getProperty "user.home") "Desktop")))
 (def http-port 9876)
 (def websockets-port 9877)
@@ -41,9 +50,14 @@
 ;;
 (def product-name "FORC-FDEV-D-1010")
 (def product-dir (file product-root product-name))
-(def app-config-path (file product-dir "AppConfig.xml"))
-(def app-config-backup-path (file product-dir "AppConfig.xml.bak"))
-(def logs-dir (file product-dir "Logs"))
+(def app-config-dir (if is-osx?
+                      (file product-dir "EliteDangerous.app" "Contents" "Resources")
+                      product-dir))
+(def app-config-path (file app-config-dir "AppConfig.xml"))
+(def app-config-backup-path (file app-config-dir "AppConfig.xml.bak"))
+(def logs-dir (if is-osx?
+                (file app-support "Frontier Developments" "Elite Dangerous" "Logs")
+                (file product-dir "Logs")))
 
 (defn fix-config-reader [in]
   "Ensure the AppConfig.xml file is fixed.
@@ -153,5 +167,4 @@
   (let [server (create-server websockets-port)
         system-callback #(set-system server %)
         system-poll-future (future (system-poller system-callback))]
-    system-poll-future
-    ))
+    system-poll-future))
