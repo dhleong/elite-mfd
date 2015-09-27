@@ -22,6 +22,10 @@
   (os-name {:windows "C:\\Program Files (x86)\\Frontier\\EDLaunch\\EDLaunch.exe"
             :mac nil })) ;; dunno yet
 
+(def launcher-name
+  (os-name {:windows "EDLaunch"
+            :mac "Elite Dangerous Launcher"}))
+
 ;;
 ;; Util
 ;;
@@ -56,13 +60,13 @@
 ;;
 
 (defn launcher-running []
-  (proc-running "EDLaunch"))
+  (proc-running launcher-name))
 
 (defn client-running []
   (proc-running "EliteDangerous"))
 
 (defn launcher-kill []
-  (kill-proc "EDLaunch"))
+  (kill-proc launcher-name))
 
 (defn client-kill []
   (kill-proc "EliteDangerous"))
