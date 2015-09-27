@@ -16,7 +16,7 @@
 ;; this is enough for the default "request docking" macro
 (def default-cmdr-bindings {:backspace "back_space" ;; also shouldn't need remapping
                             :galaxy-map nil ;; no default :(
-                            :macro-wait 1500 ;; NB: ints are always ms delays
+                            :macro-wait 2000 ;; NB: ints are always ms delays
                             :navigation "1"
                             :press-enter "enter" ;; eg: quick comms; shouldn't need remap
                             :tab-left "q"

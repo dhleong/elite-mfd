@@ -28,4 +28,4 @@
     (is (= [{:vk (vk "1") :with vk-shift} {:vk (vk "slash") :with vk-shift}]
            (binding-to-vk "\"!?\""))))
   (testing "macro-wait"
-    (is (= {:delay 1500} (binding-to-vk "macro-wait")))))
+    (is (= {:delay 2000} (binding-to-vk "macro-wait")))))

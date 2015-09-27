@@ -94,8 +94,8 @@
           "Aachen Town")))
   (testing "System name finds"
     (is (contains? 
-          (filter-stations-search "lalande") 
-          "4A504D"))))
+          (filter-stations-search "anlave") 
+          "Kobayashi City"))))
 
 (deftest test-calculate
   (testing "Simple request"
